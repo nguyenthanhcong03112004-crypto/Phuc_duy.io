@@ -1,0 +1,998 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phuc Duy Speaking 5</title>
+    
+    <!-- Libraries -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        heading: ['Poppins', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: '#2563eb', /* Blue-600 */
+                        accent: '#f97316', /* Orange-500 */
+                        highlight: '#f43f5e', /* Rose-500 */
+                        paper: '#eff6ff',
+                    },
+                    animation: {
+                        'slide-up': 'slideUp 0.4s ease-out forwards',
+                        'fade-in': 'fadeIn 0.3s ease-out forwards',
+                    },
+                    keyframes: {
+                        slideUp: {
+                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background: linear-gradient(135deg, #eff6ff 0%, #fff7ed 100%); /* Blue-50 to Orange-50 */
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 8px 32px rgba(37, 99, 235, 0.08);
+        }
+
+        /* Custom Scrollbar */
+        .custom-scroll::-webkit-scrollbar { width: 6px; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #93c5fd; border-radius: 4px; }
+        .custom-scroll::-webkit-scrollbar-thumb:hover { background: #60a5fa; }
+
+        /* Content Formatting */
+        .hint-content ul { list-style: none; padding-left: 0; margin-top: 0.5rem; }
+        .hint-content li { position: relative; padding-left: 1.5rem; margin-bottom: 0.8rem; color: #1e3a8a; line-height: 1.6; }
+        .hint-content li::before {
+            content: '\f058'; font-family: 'Font Awesome 6 Free'; font-weight: 900;
+            position: absolute; left: 0; top: 3px; color: #2563eb;
+        }
+        .hint-content strong { color: #ea580c; font-weight: 700; }
+        .hint-content h4 { font-weight: 800; color: #1e40af; margin-top: 1.2rem; margin-bottom: 0.6rem; font-family: 'Poppins', sans-serif; }
+        .hint-content em { color: #64748b; font-size: 0.9em; font-style: italic; }
+
+        /* Flip Card Styles */
+        .flip-card { perspective: 1000px; }
+        .flip-card-inner {
+            position: relative; width: 100%; height: 100%; text-align: center;
+            transition: transform 0.6s; transform-style: preserve-3d;
+        }
+        .flip-card.flipped .flip-card-inner { transform: rotateY(180deg); }
+        .flip-card-front, .flip-card-back {
+            position: absolute; width: 100%; height: 100%;
+            -webkit-backface-visibility: hidden; backface-visibility: hidden;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            border-radius: 1.5rem; padding: 2rem;
+        }
+        .flip-card-back { transform: rotateY(180deg); background-color: #eff6ff; border: 2px solid #2563eb; }
+        .flip-card-front { background-color: white; border: 1px solid #bfdbfe; }
+
+        /* Pulse for recording */
+        .recording-pulse { animation: pulse-red 1.5s infinite; }
+        @keyframes pulse-red {
+            0% { box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(244, 63, 94, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(244, 63, 94, 0); }
+        }
+    </style>
+</head>
+<body class="flex flex-col h-screen text-slate-800">
+
+    <!-- Navbar -->
+    <nav class="glass-panel sticky top-0 z-50 px-4 md:px-6 py-3 shadow-sm">
+        <div class="flex justify-between items-center mb-3 md:mb-0">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-gradient-to-br from-brand to-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-500/30">
+                    <i class="fas fa-graduation-cap"></i>
+                </div>
+                <div>
+                    <h1 class="font-heading font-bold text-lg leading-tight text-slate-800">Phuc Duy Speaking 4</h1>
+                    <p class="text-[10px] md:text-xs text-slate-500 font-medium uppercase tracking-wider">Part 3: Respond to Questions</p>
+                </div>
+            </div>
+            
+            <!-- Mode Switcher (Desktop) -->
+            <div class="hidden md:flex bg-slate-100 p-1 rounded-xl">
+                <button onclick="switchMode('speaking')" class="mode-btn active-mode px-4 py-2 rounded-lg text-sm font-bold transition-all" data-mode="speaking">
+                    <i class="fas fa-microphone mr-2"></i>Speaking
+                </button>
+                <button onclick="switchMode('flashcard')" class="mode-btn px-4 py-2 rounded-lg text-sm font-bold text-slate-500 hover:text-slate-700 transition-all" data-mode="flashcard">
+                    <i class="fas fa-layer-group mr-2"></i>Flashcards
+                </button>
+                <button onclick="switchMode('quiz')" class="mode-btn px-4 py-2 rounded-lg text-sm font-bold text-slate-500 hover:text-slate-700 transition-all" data-mode="quiz">
+                    <i class="fas fa-puzzle-piece mr-2"></i>Quiz
+                </button>
+            </div>
+
+            <!-- Mobile Menu Button -->
+            <button onclick="document.getElementById('mobileMenu').classList.toggle('hidden')" class="md:hidden text-slate-600 text-xl p-2">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+
+        <!-- Mobile Menu -->
+        <div id="mobileMenu" class="hidden md:hidden pb-3 border-t border-slate-100 mt-2 pt-2 grid grid-cols-3 gap-2">
+            <button onclick="switchMode('speaking')" class="flex flex-col items-center p-2 rounded-lg bg-blue-50 text-brand font-bold text-xs">
+                <i class="fas fa-microphone mb-1 text-lg"></i> Speaking
+            </button>
+            <button onclick="switchMode('flashcard')" class="flex flex-col items-center p-2 rounded-lg bg-white text-slate-500 font-medium text-xs">
+                <i class="fas fa-layer-group mb-1 text-lg"></i> Flashcards
+            </button>
+            <button onclick="switchMode('quiz')" class="flex flex-col items-center p-2 rounded-lg bg-white text-slate-500 font-medium text-xs">
+                <i class="fas fa-puzzle-piece mb-1 text-lg"></i> Quiz
+            </button>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="flex-grow flex flex-col p-2 md:p-6 overflow-hidden relative">
+
+        <!-- DECORATION -->
+        <div class="absolute top-20 left-10 w-72 h-72 bg-blue-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse"></div>
+        <div class="absolute bottom-20 right-10 w-72 h-72 bg-orange-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse" style="animation-delay: 2s"></div>
+
+        <!-- SECTION 1: SPEAKING -->
+        <div id="speakingSection" class="section-container h-full flex flex-col animate-slide-up">
+            
+            <!-- Progress Bar -->
+            <div class="flex items-center justify-between mb-4 px-2">
+                <span class="text-xs font-bold text-slate-500 uppercase">Tiến độ</span>
+                <div class="w-full max-w-xs h-2 bg-slate-200 rounded-full ml-4 overflow-hidden">
+                    <div id="progressBar" class="h-full bg-brand transition-all duration-500" style="width: 0%"></div>
+                </div>
+                <span id="progressText" class="text-xs font-bold text-brand ml-3">0/0</span>
+            </div>
+
+            <!-- Speaking Layout -->
+            <div class="flex flex-col md:flex-row gap-4 flex-grow overflow-hidden h-full">
+                <!-- Left: Hint -->
+                <div class="md:w-5/12 glass-panel rounded-2xl flex flex-col overflow-hidden border-t-4 border-t-accent shadow-sm">
+                    <div class="p-4 bg-white/50 border-b border-white/50 flex justify-between items-center">
+                        <span id="topicBadge" class="px-2 py-1 bg-blue-100 text-brand text-[10px] font-bold rounded uppercase">Topic</span>
+                        <button onclick="speakQuestion()" class="w-8 h-8 rounded-full bg-white text-brand hover:bg-blue-50 flex items-center justify-center shadow-sm transition-colors">
+                            <i class="fas fa-volume-high text-sm"></i>
+                        </button>
+                    </div>
+                    <div class="p-5 overflow-y-auto custom-scroll flex-grow">
+                        <h2 id="questionText" class="text-xl md:text-2xl font-heading font-bold text-slate-800 mb-6 leading-snug">Loading...</h2>
+                        
+                        <div class="bg-orange-50 rounded-xl p-4 border border-orange-100">
+                            <h3 class="text-xs font-bold text-orange-600 uppercase mb-2 flex items-center gap-1">
+                                <i class="fas fa-lightbulb"></i> Gợi ý & Cấu trúc
+                            </h3>
+                            <div id="hintContainer" class="hint-content text-sm md:text-base"></div>
+                        </div>
+                    </div>
+                    <div id="vocabFooter" class="p-3 bg-slate-50 border-t border-slate-100 flex flex-wrap gap-2 min-h-[50px]"></div>
+                </div>
+
+                <!-- Right: Interaction -->
+                <div class="md:w-7/12 glass-panel rounded-2xl flex flex-col border-t-4 border-t-brand shadow-sm relative">
+                    <div class="absolute top-4 right-4 text-xs font-mono font-bold text-slate-400 bg-slate-100 px-2 py-1 rounded z-10">
+                        <span id="timerDisplay">00:00</span>
+                    </div>
+                    
+                    <textarea id="answerInput" class="flex-grow w-full p-6 rounded-t-xl bg-transparent border-none focus:ring-0 resize-none text-base md:text-lg leading-relaxed placeholder-slate-300" placeholder="Viết câu trả lời của bạn vào đây..."></textarea>
+                    
+                    <div id="audioPlayerBox" class="hidden px-4 py-2 bg-slate-50 border-t border-b border-slate-200 flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-full bg-highlight text-white flex items-center justify-center">
+                            <i class="fas fa-microphone-lines"></i>
+                        </div>
+                        <audio id="audioPlayer" controls class="h-8 flex-grow"></audio>
+                        <button onclick="deleteRecording()" class="text-slate-400 hover:text-highlight transition-colors"><i class="fas fa-trash"></i></button>
+                    </div>
+
+                    <div class="p-4 bg-white/80 border-t border-slate-100 grid grid-cols-12 gap-3">
+                        <button id="recordBtn" onclick="toggleRecording()" class="col-span-5 md:col-span-4 py-3 rounded-xl bg-slate-800 text-white font-bold hover:bg-slate-900 transition-all flex items-center justify-center gap-2 shadow-lg">
+                            <i class="fas fa-microphone"></i> <span>Ghi âm</span>
+                        </button>
+                        
+                        <button onclick="changeSlide(-1)" id="prevBtn" class="col-span-2 md:col-span-2 py-3 rounded-xl bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 disabled:opacity-50">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        
+                        <button onclick="changeSlide(1)" id="nextBtn" class="col-span-5 md:col-span-6 py-3 rounded-xl bg-brand text-white font-bold hover:bg-blue-700 transition-all shadow-lg shadow-blue-500/20 flex items-center justify-center gap-2">
+                            Tiếp <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION 2: FLASHCARDS -->
+        <div id="flashcardSection" class="section-container hidden h-full flex flex-col items-center justify-center animate-slide-up">
+            <div class="w-full max-w-md">
+                <div class="text-center mb-6">
+                    <h2 class="text-2xl font-heading font-bold text-slate-800">Flashcards</h2>
+                    <p class="text-slate-500 text-sm">Chạm vào thẻ để xem câu ví dụ</p>
+                </div>
+
+                <div class="relative w-full h-80 cursor-pointer group perspective" onclick="flipCard()">
+                    <div id="flashcard" class="flip-card w-full h-full shadow-2xl rounded-3xl">
+                        <div class="flip-card-inner">
+                            <!-- Front -->
+                            <div class="flip-card-front bg-white">
+                                <span class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Vocabulary</span>
+                                <h3 id="fcFront" class="text-3xl font-bold text-slate-800">Word</h3>
+                                <div class="mt-4 w-12 h-1 bg-brand rounded-full"></div>
+                            </div>
+                            <!-- Back -->
+                            <div class="flip-card-back">
+                                <span class="text-xs font-bold text-brand uppercase tracking-widest mb-2">Câu ví dụ</span>
+                                <p id="fcBack" class="text-lg text-blue-900 font-medium italic">"Example sentence goes here"</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Controls -->
+                <div class="flex justify-center items-center gap-6 mt-8">
+                    <button onclick="changeFlashcard(-1)" class="w-12 h-12 rounded-full bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 shadow-md flex items-center justify-center transition-transform hover:-translate-x-1">
+                        <i class="fas fa-arrow-left"></i>
+                    </button>
+                    <span id="fcProgress" class="text-slate-400 font-mono font-bold">1 / 10</span>
+                    <button onclick="changeFlashcard(1)" class="w-12 h-12 rounded-full bg-brand text-white hover:bg-blue-700 shadow-lg shadow-blue-500/30 flex items-center justify-center transition-transform hover:translate-x-1">
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION 3: QUIZ -->
+        <div id="quizSection" class="section-container hidden h-full flex flex-col items-center justify-center animate-slide-up p-4">
+            <div class="glass-panel w-full max-w-2xl rounded-2xl p-6 md:p-10 shadow-xl">
+                <div class="flex justify-between items-center mb-8">
+                    <h2 class="text-xl font-heading font-bold text-slate-800"><i class="fas fa-pencil-alt text-brand mr-2"></i>Điền từ còn thiếu</h2>
+                    <span id="quizScore" class="px-3 py-1 bg-blue-100 text-blue-700 rounded-full font-bold text-sm">Điểm: 0</span>
+                </div>
+
+                <div id="quizContent" class="mb-8">
+                    <p class="text-lg md:text-2xl text-slate-700 leading-relaxed text-center font-medium" id="quizQuestion">
+                        Loading...
+                    </p>
+                    <div id="quizHintText" class="text-center text-sm text-slate-400 mt-2 italic hidden"></div>
+                </div>
+
+                <div id="quizOptions" class="grid grid-cols-2 gap-4">
+                    <!-- Options injected via JS -->
+                </div>
+
+                <div id="quizFeedback" class="mt-6 text-center hidden">
+                    <p class="text-lg font-bold mb-2" id="feedbackText"></p>
+                    <button onclick="nextQuiz()" class="px-6 py-2 bg-slate-800 text-white rounded-lg hover:bg-slate-900">Câu tiếp theo</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- End Screen -->
+        <div id="endScreen" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+            <div class="bg-white w-full max-w-lg rounded-3xl p-8 text-center shadow-2xl animate-fade-in relative">
+                <button onclick="document.getElementById('endScreen').classList.add('hidden')" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600"><i class="fas fa-times text-xl"></i></button>
+                
+                <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6 text-green-600 text-3xl">
+                    <i class="fas fa-trophy"></i>
+                </div>
+                <h2 class="text-2xl font-bold text-slate-800 mb-2">Hoàn thành bài học!</h2>
+                <p class="text-slate-500 mb-6">Bạn đã trả lời hết các câu hỏi. Hãy tải kết quả về máy.</p>
+                
+                <div class="flex flex-col gap-3">
+                    <button onclick="downloadWord()" class="w-full py-3 bg-blue-50 text-blue-700 font-bold rounded-xl hover:bg-blue-100 border border-blue-200 flex items-center justify-center gap-2">
+                        <i class="fas fa-file-word"></i> Tải bản Word (Đáp án)
+                    </button>
+                    <button onclick="downloadAudio()" class="w-full py-3 bg-brand text-white font-bold rounded-xl hover:bg-blue-700 shadow-lg shadow-blue-500/30 flex items-center justify-center gap-2">
+                        <i class="fas fa-file-audio"></i> Tải File Ghi âm (Zip)
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+<script>
+    // --- SPECIALIZED DATA FOR "Phuc Duy Speaking 4" ---
+    const speakingData = [
+        // --- TOPIC 1: SHOPPING ---
+        {
+            topic: "Shopping",
+            text: "How often do you go shopping?",
+            hint: `
+                <ul>
+                    <li><strong>Why:</strong> It is my <strong>hobby</strong> (sở thích).</li>
+                    <li>It helps me <strong>relax</strong>.</li>
+                </ul>
+            `,
+            vocab: ["hobby", "relax"]
+        },
+        {
+            topic: "Online Shopping",
+            text: "What kind of things do you usually buy online?",
+            hint: `
+                <ul>
+                    <li>I buy a lot of <strong>clothes</strong>, <strong>toys</strong>, <strong>foods</strong> and <strong>drinks</strong>.</li>
+                </ul>
+            `,
+            vocab: ["clothes", "toys", "foods", "drinks"]
+        },
+        {
+            topic: "Shopping Preference",
+            text: "Do you prefer large malls or small local shops? Why?",
+            hint: `
+                <ul>
+                    <li>I love <strong>supermarket</strong>.</li>
+                    <li><strong>Reason:</strong> It is <strong>bigger</strong> and <strong>larger</strong> than the small shops.</li>
+                </ul>
+            `,
+            vocab: ["supermarket", "bigger", "larger"]
+        },
+        // --- TOPIC 2: TRAVEL ---
+        {
+            topic: "Travel: Vacation",
+            text: "When was the last time you went on a vacation?",
+            hint: `
+                <ul>
+                    <li><strong>When:</strong> Break time and summer holiday.</li>
+                    <li><strong>Prepare:</strong> Toys, sunglasses, suncream, umbrella, towel.</li>
+                    <li><strong>Nature:</strong> Beautiful. White sand, blue <strong>seawater</strong>, <strong>coconut trees</strong>, mountains.</li>
+                    <li><strong>Weather:</strong> Nice (Four seasons).</li>
+                    <li><strong>Buildings:</strong> Cinema, malls... -> <strong>Convenient</strong>.</li>
+                </ul>
+            `,
+            vocab: ["suncream", "towel", "seawater", "coconut trees", "convenient"]
+        },
+        {
+            topic: "Travel: Transport",
+            text: "Do you prefer traveling by car or by plane?",
+            hint: `
+                <ul>
+                    <li>I like traveling by <strong>plane</strong>.</li>
+                    <li><strong>Reasons:</strong> It is <strong>quiet</strong>. I can sleep. I can see the <strong>views</strong>.</li>
+                </ul>
+            `,
+            vocab: ["plane", "quiet", "views"]
+        },
+        {
+            topic: "Travel: Hotel",
+            text: "What is the most important thing to consider when choosing a hotel?",
+            hint: `
+                <ul>
+                    <li><strong>Price</strong>, <strong>Location</strong>, and <strong>Comfort</strong>.</li>
+                </ul>
+            `,
+            vocab: ["price", "location", "comfort"]
+        },
+        // --- TOPIC 3: MOVIES ---
+        {
+            topic: "Movies",
+            text: "How often do you go to the cinema?",
+            hint: `
+                <ul>
+                    <li><strong>Who:</strong> <strong>Movie lover</strong>.</li>
+                    <li><strong>Why:</strong> Hobby, relax. Movies are <strong>meaningful</strong> (learn a lot).</li>
+                </ul>
+            `,
+            vocab: ["movie lover", "meaningful"]
+        },
+        {
+            topic: "Movie Genre",
+            text: "What kind of movies do you like best?",
+            hint: `
+                <ul>
+                    <li><strong>Genre:</strong> <strong>Cartoon</strong>.</li>
+                    <li><strong>Favorite:</strong> <strong>Doraemon</strong>.</li>
+                    <li><strong>Plot:</strong> About a <strong>robot from future</strong> helping Nobita.</li>
+                </ul>
+            `,
+            vocab: ["cartoon", "Doraemon", "robot from future"]
+        },
+        {
+            topic: "Home vs Theater",
+            text: "Do you think watching movies at home is better than the theater?",
+            hint: `
+                <ul>
+                    <li>Yes, I love watching at home.</li>
+                    <li><strong>1. Free</strong>.</li>
+                    <li><strong>2. Convenient</strong>.</li>
+                    <li><strong>3. Quiet</strong> (not many people).</li>
+                    <li><strong>4. Comfort</strong> (stay at home).</li>
+                </ul>
+            `,
+            vocab: ["free", "convenient", "quiet", "comfort"]
+        },
+        // --- TOPIC 4: READING ---
+        {
+            topic: "Reading",
+            text: "Do you like reading books?",
+            hint: `
+                <ul>
+                    <li>Yes, I am a <strong>book lover</strong>.</li>
+                    <li><strong>Where:</strong> <strong>Library</strong>.</li>
+                    <li><strong>Why:</strong> Hobby, relax. Books are <strong>meaningful</strong>.</li>
+                </ul>
+            `,
+            vocab: ["book lover", "library", "meaningful"]
+        },
+        {
+            topic: "Reading Time",
+            text: "When do you usually read?",
+            hint: `
+                <ul>
+                    <li>In my <strong>free time</strong>.</li>
+                </ul>
+            `,
+            vocab: ["free time"]
+        },
+        {
+            topic: "E-books vs Paper books",
+            text: "Do you prefer e-books or traditional paper books?",
+            hint: `
+                <ul>
+                    <li>I love <strong>e-books</strong> (sách điện tử).</li>
+                    <li><strong>1. Free</strong>.</li>
+                    <li><strong>2. Availability:</strong> Find many books on Internet.</li>
+                    <li><strong>3. Convenient</strong>.</li>
+                </ul>
+            `,
+            vocab: ["e-books", "free", "convenient"]
+        },
+        // --- TOPIC 5: INTERNET ---
+        {
+            topic: "Internet Usage",
+            text: "How much time do you spend on the internet daily?",
+            hint: `
+                <ul>
+                    <li><strong>Time:</strong> <strong>4 - 5 hours</strong> a day.</li>
+                    <li><strong>Usage:</strong> Read books, watch <strong>Youtube</strong>/videos, play <strong>video games</strong>...</li>
+                </ul>
+            `,
+            vocab: ["4-5 hours", "youtube", "video games"]
+        },
+        {
+            topic: "Internet Purpose",
+            text: "What do you mainly use the internet for?",
+            hint: `
+                <ul>
+                    <li><strong>Studying</strong> and <strong>Entertainment</strong>.</li>
+                </ul>
+            `,
+            vocab: ["studying", "entertainment"]
+        },
+        {
+            topic: "Internet Benefits",
+            text: "Do you think the internet has improved our lives? Why?",
+            hint: `
+                <ul>
+                    <li>Yes, we can <strong>learn</strong> new things and <strong>connect</strong> with people.</li>
+                </ul>
+            `,
+            vocab: ["learn", "connect"]
+        },
+        // --- TOPIC 6: SPORTS ---
+        {
+            topic: "Sports",
+            text: "Do you play any sports?",
+            hint: `
+                <ul>
+                    <li><strong>Who:</strong> <strong>Sport lover</strong>.</li>
+                    <li><strong>Where:</strong> <strong>Playground</strong>.</li>
+                    <li><strong>Why:</strong> Hobby, relax, <strong>healthy</strong>.</li>
+                    <li><strong>With whom:</strong> Friends (<strong>more people more fun</strong>).</li>
+                </ul>
+            `,
+            vocab: ["sport lover", "playground", "healthy", "more people more fun"]
+        },
+        {
+            topic: "Popular Sport",
+            text: "What is a popular sport in your country?",
+            hint: `
+                <ul>
+                    <li>It is <strong>soccer</strong>.</li>
+                </ul>
+            `,
+            vocab: ["soccer"]
+        },
+        {
+            topic: "Team Sports",
+            text: "Do you think children should play team sports? Why?",
+            hint: `
+                <ul>
+                    <li><strong>Yes</strong>.</li>
+                    <li>It is <strong>healthy</strong> and helps children be <strong>energetic</strong>.</li>
+                    <li>Children can learn <strong>teamwork</strong>.</li>
+                </ul>
+            `,
+            vocab: ["healthy", "energetic", "teamwork"]
+        },
+        // --- TOPIC 7: MUSIC ---
+        {
+            topic: "Music",
+            text: "What type of music do you listen to?",
+            hint: `
+                <ul>
+                    <li><strong>Who:</strong> <strong>Music lover</strong>.</li>
+                    <li><strong>Genre:</strong> <strong>Golden pop</strong>.</li>
+                    <li><strong>Why:</strong> Hobby, relax, <strong>meaningful</strong>.</li>
+                </ul>
+            `,
+            vocab: ["music lover", "golden pop", "meaningful"]
+        },
+        {
+            topic: "Instruments",
+            text: "Do you play any musical instruments?",
+            hint: `
+                <ul>
+                    <li>I play the <strong>piano</strong> / <strong>guitar</strong>.</li>
+                </ul>
+            `,
+            vocab: ["piano", "guitar"]
+        },
+        {
+            topic: "Concerts vs Alone",
+            text: "Do you prefer listening to music alone or going to concerts?",
+            hint: `
+                <ul>
+                    <li>I love listening to music <strong>alone</strong> because:</li>
+                    <li>1. <strong>Free</strong>.</li>
+                    <li>2. <strong>Quiet</strong>.</li>
+                </ul>
+            `,
+            vocab: ["alone", "free", "quiet"]
+        },
+        // --- TOPIC 8: HOMETOWN ---
+        {
+            topic: "Hometown",
+            text: "Where is your hometown?",
+            hint: `
+                <ul>
+                    <li><strong>Where:</strong> <strong>Ha Tinh</strong> city.</li>
+                    <li><strong>Nature:</strong> Very <strong>beautiful</strong>. Many nice <strong>beaches</strong>.</li>
+                    <li><strong>People:</strong> <strong>Friendly</strong>.</li>
+                </ul>
+            `,
+            vocab: ["Ha Tinh", "beautiful", "beaches", "friendly"]
+        },
+        {
+            topic: "Famous For",
+            text: "What is your hometown famous for?",
+            hint: `
+                <ul>
+                    <li>Famous for <strong>Candy</strong> (Cu Do) or <strong>Beach</strong>.</li>
+                </ul>
+            `,
+            vocab: ["candy", "beach"]
+        },
+        {
+            topic: "Recommendation",
+            text: "Would you recommend tourists to visit your hometown?",
+            hint: `
+                <ul>
+                    <li><strong>Yes</strong>, absolutely. It is beautiful.</li>
+                </ul>
+            `,
+            vocab: ["yes", "beautiful"]
+        },
+        // --- TOPIC 9: WORK ---
+        {
+            topic: "Work Preference",
+            text: "Do you prefer working alone or in a team?",
+            hint: `
+                <ul>
+                    <li>I like <strong>teamwork</strong>.</li>
+                    <li>1. People can <strong>help each other</strong>.</li>
+                    <li>2. Teamwork has a lot of <strong>ideas</strong>.</li>
+                </ul>
+            `,
+            vocab: ["teamwork", "help each other", "ideas"]
+        },
+        // --- TOPIC 10: TRANSPORT ---
+        {
+            topic: "Transport",
+            text: "How do you usually get to work or school?",
+            hint: `
+                <ul>
+                    <li><strong>Who:</strong> <strong>School lover</strong>.</li>
+                    <li><strong>Vehicle:</strong> By <strong>bike</strong>.</li>
+                    <li><strong>Why:</strong> School is <strong>near</strong> my house.</li>
+                </ul>
+            `,
+            vocab: ["school lover", "bike", "near"]
+        }
+    ];
+
+    // 2. Drill Sentences for Quiz & Flashcards
+    const drillSentences = [
+        { sentence: "Shopping helps me relax.", word: "relax" },
+        { sentence: "I buy clothes and toys online.", word: "clothes" },
+        { sentence: "Supermarket is bigger than small shops.", word: "bigger" },
+        { sentence: "The nature is very beautiful.", word: "beautiful" },
+        { sentence: "I like traveling by plane.", word: "plane" },
+        { sentence: "Movies are meaningful.", word: "meaningful" },
+        { sentence: "Doraemon is a robot from future.", word: "robot from future" },
+        { sentence: "Watching at home is convenient.", word: "convenient" },
+        { sentence: "I am a book lover.", word: "book lover" },
+        { sentence: "I find books on the Internet.", word: "Internet" },
+        { sentence: "I spend 4 hours on the internet.", word: "4-5 hours" },
+        { sentence: "It is healthy.", word: "healthy" },
+        { sentence: "Children learn teamwork.", word: "teamwork" },
+        { sentence: "Music is meaningful.", word: "meaningful" },
+        { sentence: "I listen to golden pop.", word: "golden pop" },
+        { sentence: "Ha Tinh is very beautiful.", word: "Ha Tinh" },
+        { sentence: "People are friendly.", word: "friendly" },
+        { sentence: "Teamwork has a lot of ideas.", word: "ideas" },
+        { sentence: "I go to school by bike.", word: "bike" },
+        { sentence: "School is near my house.", word: "near" }
+    ];
+
+    // --- STATE ---
+    let appState = {
+        mode: 'speaking', 
+        questions: [],
+        currentIndex: 0,
+        recording: false,
+        mediaRecorder: null,
+        audioChunks: [],
+        timerInterval: null,
+        flashcards: [],
+        flashcardIndex: 0,
+        isFlipped: false,
+        quizzes: [],
+        quizIndex: 0,
+        score: 0
+    };
+
+    // --- INIT ---
+    function init() {
+        processSpeakingData();
+        renderSlide(0);
+        generateFlashcards();
+        generateQuiz();
+    }
+
+    function processSpeakingData() {
+        appState.questions = speakingData.map((item, idx) => ({
+            id: idx,
+            topic: item.topic,
+            text: item.text,
+            hint: item.hint,
+            vocab: item.vocab,
+            userText: "",
+            audioBlob: null
+        }));
+        updateProgress();
+    }
+
+    // --- MODE SWITCHER ---
+    function switchMode(mode) {
+        appState.mode = mode;
+        document.querySelectorAll('.section-container').forEach(el => el.classList.add('hidden'));
+        document.querySelectorAll('.mode-btn').forEach(btn => {
+            btn.classList.remove('active-mode', 'bg-blue-50', 'text-brand');
+            btn.classList.add('text-slate-500');
+            if(btn.dataset.mode === mode) {
+                btn.classList.add('active-mode', 'bg-blue-50', 'text-brand');
+                btn.classList.remove('text-slate-500');
+            }
+        });
+        document.getElementById(`${mode}Section`).classList.remove('hidden');
+    }
+
+    // ==========================================
+    // MODULE 1: SPEAKING
+    // ==========================================
+    function renderSlide(index) {
+        if (index < 0 || index >= appState.questions.length) return;
+        
+        if(appState.questions[appState.currentIndex]) {
+            appState.questions[appState.currentIndex].userText = document.getElementById('answerInput').value;
+        }
+
+        resetRecordingUI();
+        appState.currentIndex = index;
+        const q = appState.questions[index];
+
+        document.getElementById('topicBadge').innerText = q.topic;
+        document.getElementById('questionText').innerText = q.text;
+        document.getElementById('hintContainer').innerHTML = q.hint;
+        document.getElementById('answerInput').value = q.userText;
+
+        const vFooter = document.getElementById('vocabFooter');
+        vFooter.innerHTML = '';
+        q.vocab.forEach(v => {
+            const span = document.createElement('span');
+            span.className = "px-3 py-1 bg-white border border-slate-200 rounded-full text-xs font-bold text-slate-500";
+            span.innerText = v;
+            vFooter.appendChild(span);
+        });
+
+        if(q.audioBlob) setupAudioPlayer(q.audioBlob);
+
+        document.getElementById('prevBtn').disabled = (index === 0);
+        const nextBtn = document.getElementById('nextBtn');
+        if(index === appState.questions.length - 1) {
+            nextBtn.innerHTML = 'Kết thúc <i class="fas fa-flag-checkered ml-2"></i>';
+        } else {
+            nextBtn.innerHTML = 'Tiếp <i class="fas fa-arrow-right ml-2"></i>';
+        }
+        updateProgress();
+    }
+
+    function changeSlide(dir) {
+        const newIndex = appState.currentIndex + dir;
+        if(newIndex >= appState.questions.length) {
+            document.getElementById('endScreen').classList.remove('hidden');
+        } else {
+            renderSlide(newIndex);
+        }
+    }
+
+    function updateProgress() {
+        const pct = ((appState.currentIndex + 1) / appState.questions.length) * 100;
+        document.getElementById('progressBar').style.width = `${pct}%`;
+        document.getElementById('progressText').innerText = `${appState.currentIndex + 1}/${appState.questions.length}`;
+    }
+
+    async function toggleRecording() {
+        const btn = document.getElementById('recordBtn');
+        if (!appState.recording) {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                appState.mediaRecorder = new MediaRecorder(stream);
+                appState.audioChunks = [];
+                appState.mediaRecorder.ondataavailable = e => appState.audioChunks.push(e.data);
+                appState.mediaRecorder.onstop = () => {
+                    const blob = new Blob(appState.audioChunks, { type: 'audio/webm' });
+                    appState.questions[appState.currentIndex].audioBlob = blob;
+                    setupAudioPlayer(blob);
+                    stream.getTracks().forEach(track => track.stop());
+                };
+                appState.mediaRecorder.start();
+                appState.recording = true;
+                btn.classList.add('bg-highlight', 'recording-pulse');
+                btn.classList.remove('bg-slate-800');
+                btn.innerHTML = '<i class="fas fa-stop"></i> <span>Dừng</span>';
+                startTimer();
+            } catch (err) { alert("Cần quyền truy cập Microphone!"); }
+        } else {
+            appState.mediaRecorder.stop();
+            appState.recording = false;
+            resetRecordingUI();
+        }
+    }
+
+    function resetRecordingUI() {
+        stopTimer();
+        document.getElementById('timerDisplay').innerText = "00:00";
+        document.getElementById('audioPlayerBox').classList.add('hidden');
+        const btn = document.getElementById('recordBtn');
+        btn.classList.remove('bg-highlight', 'recording-pulse');
+        btn.classList.add('bg-slate-800');
+        btn.innerHTML = '<i class="fas fa-microphone"></i> <span>Ghi âm</span>';
+    }
+
+    function setupAudioPlayer(blob) {
+        const url = URL.createObjectURL(blob);
+        document.getElementById('audioPlayer').src = url;
+        document.getElementById('audioPlayerBox').classList.remove('hidden');
+    }
+
+    function deleteRecording() {
+        if(confirm("Xóa ghi âm?")) {
+            appState.questions[appState.currentIndex].audioBlob = null;
+            document.getElementById('audioPlayerBox').classList.add('hidden');
+        }
+    }
+
+    function startTimer() {
+        let sec = 0;
+        appState.timerInterval = setInterval(() => {
+            sec++;
+            const min = Math.floor(sec/60).toString().padStart(2,'0');
+            const s = (sec%60).toString().padStart(2,'0');
+            document.getElementById('timerDisplay').innerText = `${min}:${s}`;
+        }, 1000);
+    }
+    function stopTimer() { clearInterval(appState.timerInterval); }
+    function speakQuestion() {
+        const text = appState.questions[appState.currentIndex].text;
+        const u = new SpeechSynthesisUtterance(text);
+        u.lang = 'en-US';
+        window.speechSynthesis.speak(u);
+    }
+
+    // ==========================================
+    // MODULE 2: FLASHCARDS
+    // ==========================================
+    function generateFlashcards() {
+        let uniqueMap = new Map();
+        drillSentences.forEach(item => {
+            if(!uniqueMap.has(item.word)) {
+                uniqueMap.set(item.word, item.sentence);
+            }
+        });
+        
+        let cards = [];
+        uniqueMap.forEach((context, word) => {
+            cards.push({ word: word, context: context });
+        });
+        
+        appState.flashcards = cards.sort(() => Math.random() - 0.5);
+        renderFlashcard();
+    }
+
+    function renderFlashcard() {
+        const card = appState.flashcards[appState.flashcardIndex];
+        const cardEl = document.getElementById('flashcard');
+        
+        cardEl.classList.remove('flipped');
+        appState.isFlipped = false;
+
+        setTimeout(() => {
+            document.getElementById('fcFront').innerText = card.word;
+            const highlightedContext = card.context.replace(new RegExp(card.word, 'gi'), `<span class="text-brand font-bold bg-blue-100 px-1 rounded">${card.word}</span>`);
+            document.getElementById('fcBack').innerHTML = highlightedContext;
+            document.getElementById('fcProgress').innerText = `${appState.flashcardIndex + 1} / ${appState.flashcards.length}`;
+        }, 200);
+    }
+
+    function flipCard() {
+        const cardEl = document.getElementById('flashcard');
+        appState.isFlipped = !appState.isFlipped;
+        if(appState.isFlipped) cardEl.classList.add('flipped');
+        else cardEl.classList.remove('flipped');
+    }
+
+    function changeFlashcard(dir) {
+        let newIdx = appState.flashcardIndex + dir;
+        if(newIdx < 0) newIdx = appState.flashcards.length - 1;
+        if(newIdx >= appState.flashcards.length) newIdx = 0;
+        appState.flashcardIndex = newIdx;
+        renderFlashcard();
+    }
+
+    // ==========================================
+    // MODULE 3: QUIZ
+    // ==========================================
+    function generateQuiz() {
+        let quizList = drillSentences.map(item => {
+            const regex = new RegExp(`(${item.word})`, 'i');
+            const parts = item.sentence.split(regex);
+            let qText = item.sentence;
+            if (parts.length > 1) {
+                qText = item.sentence.replace(regex, "_______");
+            }
+            return {
+                question: qText,
+                answer: item.word
+            };
+        });
+
+        appState.quizzes = quizList.sort(() => Math.random() - 0.5);
+        renderQuiz();
+    }
+
+    function renderQuiz() {
+        if(appState.quizIndex >= appState.quizzes.length) {
+            document.getElementById('quizContent').innerHTML = `
+                <div class="text-center">
+                    <div class="text-6xl mb-4">🎉</div>
+                    <div class="text-brand text-2xl font-bold">Hoàn thành Quiz!</div>
+                    <div class="text-slate-500 mt-2">Tổng điểm: ${appState.score}</div>
+                </div>`;
+            document.getElementById('quizOptions').innerHTML = `<button onclick="location.reload()" class="col-span-2 py-3 bg-brand text-white rounded-xl shadow-lg">Làm lại từ đầu</button>`;
+            document.getElementById('quizFeedback').classList.add('hidden');
+            return;
+        }
+
+        const q = appState.quizzes[appState.quizIndex];
+        document.getElementById('quizQuestion').innerText = q.question;
+        document.getElementById('quizFeedback').classList.add('hidden');
+
+        let allWords = [...new Set(drillSentences.map(s => s.word))];
+        let distractors = allWords
+            .filter(w => w.toLowerCase() !== q.answer.toLowerCase())
+            .sort(() => Math.random() - 0.5)
+            .slice(0, 3);
+        
+        let options = [...distractors, q.answer].sort(() => Math.random() - 0.5);
+
+        const optsContainer = document.getElementById('quizOptions');
+        optsContainer.innerHTML = '';
+        options.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = "py-4 px-2 bg-white border-2 border-slate-100 rounded-xl hover:border-brand hover:bg-blue-50 font-bold text-slate-600 transition-all shadow-sm break-words";
+            btn.innerText = opt;
+            btn.onclick = () => checkQuiz(btn, opt, q.answer);
+            optsContainer.appendChild(btn);
+        });
+    }
+
+    function checkQuiz(btn, selected, correct) {
+        const buttons = document.querySelectorAll('#quizOptions button');
+        buttons.forEach(b => b.disabled = true);
+
+        const feedback = document.getElementById('quizFeedback');
+        const feedbackText = document.getElementById('feedbackText');
+        feedback.classList.remove('hidden');
+
+        if(selected.toLowerCase() === correct.toLowerCase()) {
+            btn.classList.add('bg-green-500', 'border-green-600', 'text-white');
+            btn.classList.remove('bg-white', 'text-slate-600');
+            appState.score += 10;
+            document.getElementById('quizScore').innerText = `Điểm: ${appState.score}`;
+            feedbackText.innerText = "Chính xác! 🎉";
+            feedbackText.className = "text-xl font-bold mb-2 text-green-600";
+        } else {
+            btn.classList.add('bg-red-500', 'border-red-600', 'text-white');
+            buttons.forEach(b => {
+                if(b.innerText.toLowerCase() === correct.toLowerCase()) {
+                    b.classList.add('bg-green-100', 'border-green-500', 'text-green-700');
+                }
+            });
+            feedbackText.innerText = `Sai rồi. Đáp án là: ${correct}`;
+            feedbackText.className = "text-xl font-bold mb-2 text-red-500";
+        }
+    }
+
+    function nextQuiz() {
+        appState.quizIndex++;
+        renderQuiz();
+    }
+
+    // --- DOWNLOADS ---
+    function downloadWord() {
+        let html = `<html><head><meta charset='utf-8'></head><body><h1>IELTS SPEAKING ANSWERS</h1>`;
+        appState.questions.forEach((q, i) => {
+            if(q.userText) html += `<h3>Q${i+1}: ${q.text}</h3><p>Ans: ${q.userText}</p><hr>`;
+        });
+        html += "</body></html>";
+        const blob = new Blob([html], {type: 'application/msword'});
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'Phuc_Duy_4_Answers.doc';
+        a.click();
+    }
+
+    async function downloadAudio() {
+        const zip = new JSZip();
+        let c = 0;
+        appState.questions.forEach((q, i) => {
+            if(q.audioBlob) {
+                zip.file(`Question_${i+1}.webm`, q.audioBlob);
+                c++;
+            }
+        });
+        if(c===0) return alert("Chưa có bản ghi âm nào!");
+        const content = await zip.generateAsync({type:"blob"});
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(content);
+        a.download = "Phuc_Duy_4_Recordings.zip";
+        a.click();
+    }
+
+    init();
+
+</script>
+</body>
+</html>
