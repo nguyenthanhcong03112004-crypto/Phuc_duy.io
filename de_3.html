@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ Thống Luyện Thi Tiếng Anh (English Practice 3)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', system-ui, sans-serif; background-color: #f8fafc; }
+        
+        /* Flashcard 3D Flip Styles */
+        .perspective-1000 { perspective: 1000px; }
+        .transform-style-3d { transform-style: preserve-3d; }
+        .backface-hidden { backface-visibility: hidden; }
+        .rotate-y-180 { transform: rotateY(180deg); }
+        .flip-card-inner { transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1); }
+        .flip-card.flipped .flip-card-inner { transform: rotateY(180deg); }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #64748b; }
+
+        .question-block { border-bottom: 1px solid #e2e8f0; padding-bottom: 1.5rem; margin-bottom: 1.5rem; }
+        .question-block:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+        
+        input[type="radio"]:checked + span { font-weight: 700; color: #1d4ed8; }
+        
+        /* Guide Styles */
+        .guide-card { transition: all 0.3s ease; }
+        .guide-card:hover { transform: translateY(-3px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
+
+        /* Sidebar Transition */
+        #sidebar { transition: transform 0.3s ease-in-out; }
+        
+        /* Reading Split View Adjustments */
+        .passage-content p { margin-bottom: 0.75rem; }
+        
+        /* Tooltip Arrow */
+        .tooltip-arrow::before {
+            content: '';
+            position: absolute;
+            top: -6px;
+            left: 20px;
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-bottom: 6px solid white;
+        }
+    </style>
+</head>
+<body class="text-gray-800 antialiased flex h-screen overflow-hidden bg-gray-100">
+
+    <!-- Mobile Overlay for Sidebar -->
+    <div id="sidebarOverlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black bg-opacity-50 z-20 hidden lg:hidden transition-opacity"></div>
+
+    <!-- Sidebar: Test Selection -->
+    <aside id="sidebar" class="w-72 bg-white shadow-2xl h-full flex flex-col z-30 fixed lg:relative transform -translate-x-full lg:translate-x-0">
+        <div class="p-5 bg-blue-700 text-white flex justify-between items-center shrink-0 shadow-md">
+            <div class="flex items-center gap-3">
+                <i class="fa-solid fa-graduation-cap text-3xl"></i>
+                <h1 class="font-bold text-lg leading-tight">Luyện Thi Anh<br><span class="text-sm font-normal text-blue-200">Đề Ôn Tập Chi Tiết</span></h1>
+            </div>
+            <button onclick="toggleSidebar()" class="lg:hidden text-white hover:text-blue-200 focus:outline-none text-2xl">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+        <div class="flex-1 overflow-y-auto p-4" id="testList">
+            <button class="w-full text-left px-4 py-4 mb-2 rounded-xl flex items-center transition-all duration-200 border-l-4 bg-gray-50 text-gray-600 border-transparent hover:bg-gray-100 shadow-sm">
+                <div class="flex-1">
+                    <span class="block">English Practice 1</span>
+                    <span class="text-xs font-normal">Đã hoàn thành</span>
+                </div>
+            </button>
+            <button class="w-full text-left px-4 py-4 mb-2 rounded-xl flex items-center transition-all duration-200 border-l-4 bg-gray-50 text-gray-600 border-transparent hover:bg-gray-100 shadow-sm">
+                <div class="flex-1">
+                    <span class="block">English Practice 2</span>
+                    <span class="text-xs font-normal">Đã hoàn thành</span>
+                </div>
+            </button>
+            <button class="w-full text-left px-4 py-4 mb-2 rounded-xl flex items-center transition-all duration-200 border-l-4 bg-blue-50 text-blue-800 font-bold border-blue-600 shadow-sm hover:shadow-md">
+                <div class="flex-1">
+                    <span class="block">English Practice 3</span>
+                    <span class="text-xs text-blue-600 font-normal">Đầy đủ Trắc nghiệm & Tự luận</span>
+                </div>
+                <i class="fa-solid fa-star text-yellow-500"></i>
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 flex flex-col h-full relative overflow-hidden w-full">
+        
+        <!-- Header & Tabs -->
+        <header class="bg-white shadow-sm z-10 shrink-0">
+            <div class="px-4 md:px-6 py-4 flex justify-between items-center border-b border-gray-100">
+                <div class="flex items-center gap-4">
+                    <button onclick="toggleSidebar()" class="text-gray-500 hover:text-blue-600 focus:outline-none text-2xl p-2 rounded-lg hover:bg-gray-100 transition-colors">
+                        <i class="fa-solid fa-bars"></i>
+                    </button>
+                    <h2 class="text-xl md:text-2xl font-bold text-gray-800 truncate" id="currentTestTitle">ENGLISH PRACTICE 3</h2>
+                </div>
+                <div class="text-sm font-bold text-blue-700 bg-blue-100 px-4 py-1.5 rounded-full flex items-center shadow-sm whitespace-nowrap">
+                    <i class="fa-solid fa-pen-nib mr-2"></i> 71 Câu Hỏi
+                </div>
+            </div>
+            <!-- Tabs -->
+            <div class="flex border-b border-gray-200 px-2 md:px-6 bg-gray-50 overflow-x-auto no-scrollbar">
+                <button onclick="switchTab('guide')" id="tab-guide" class="py-3 px-4 md:px-6 text-blue-600 border-b-2 border-blue-600 font-bold focus:outline-none flex items-center gap-2 bg-white whitespace-nowrap">
+                    <i class="fa-solid fa-map-location-dot"></i> Hướng Dẫn
+                </button>
+                <button onclick="switchTab('test')" id="tab-test" class="py-3 px-4 md:px-6 text-gray-500 hover:text-blue-600 font-semibold focus:outline-none flex items-center gap-2 transition-colors whitespace-nowrap">
+                    <i class="fa-solid fa-file-pen"></i> Làm Bài Thi
+                </button>
+                <button onclick="switchTab('flashcard')" id="tab-flashcard" class="py-3 px-4 md:px-6 text-gray-500 hover:text-blue-600 font-semibold focus:outline-none flex items-center gap-2 transition-colors whitespace-nowrap">
+                    <i class="fa-solid fa-layer-group"></i> Flashcard
+                </button>
+            </div>
+        </header>
+
+        <!-- Container for Scrollable Content -->
+        <div class="flex-1 overflow-y-auto relative w-full" id="mainScrollContainer">
+            
+            <!-- VIEW: GUIDE (CHIẾN THUẬT LÀM BÀI) -->
+            <div id="content-guide" class="p-4 md:p-8 bg-gray-50">
+                <div class="max-w-5xl mx-auto">
+                    <div class="text-center mb-8 md:mb-10">
+                        <h2 class="text-2xl md:text-3xl font-extrabold text-gray-800 mb-3">Cấu Trúc & Chiến Thuật Làm Bài (Practice 3)</h2>
+                        <p class="text-gray-600 text-sm md:text-base">Đề thi bao gồm điền từ vào chỗ trống, cấu tạo từ, tìm lỗi sai, đọc hiểu và viết lại câu. Cần nắm vững phương pháp để tối ưu hóa điểm số.</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+                        <!-- VOCAB & WORD FORM -->
+                        <div class="guide-card bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+                            <div class="flex items-center gap-4 mb-4">
+                                <div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xl"><i class="fa-solid fa-spell-check"></i></div>
+                                <div>
+                                    <h3 class="font-bold text-lg text-gray-800">1. Từ vựng & Cấu tạo từ</h3>
+                                    <span class="text-xs font-bold bg-blue-100 text-blue-800 px-2 py-1 rounded">Part II, III (Câu 1 - 30)</span>
+                                </div>
+                            </div>
+                            <ul class="text-gray-600 space-y-2 text-sm list-disc pl-5 leading-relaxed">
+                                <li><strong>Điền từ:</strong> Xác định ý nghĩa phù hợp với ngữ cảnh câu. Chú ý các cụm từ cố định (proud of, communicate with, protect... from).</li>
+                                <li><strong>Word Form:</strong> Xác định từ loại cần điền qua vị trí trong câu (ví dụ: sau tính từ sở hữu là danh từ; sau động từ tobe là tính từ). Chú ý tiền tố phủ định (un-, in-).</li>
+                            </ul>
+                        </div>
+
+                        <!-- ERROR CORRECTION -->
+                        <div class="guide-card bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+                            <div class="flex items-center gap-4 mb-4">
+                                <div class="w-12 h-12 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center text-xl"><i class="fa-solid fa-magnifying-glass-chart"></i></div>
+                                <div>
+                                    <h3 class="font-bold text-lg text-gray-800">2. Tìm & Sửa lỗi sai</h3>
+                                    <span class="text-xs font-bold bg-purple-100 text-purple-800 px-2 py-1 rounded">Part IV (Câu 31 - 40)</span>
+                                </div>
+                            </div>
+                            <ul class="text-gray-600 space-y-2 text-sm list-disc pl-5 leading-relaxed">
+                                <li>Chú ý cấu trúc <strong>enough</strong> (Adj/Adv + enough + to V).</li>
+                                <li>Kiểm tra mệnh đề quan hệ rút gọn (dùng V-ing cho chủ động, V-ed cho bị động).</li>
+                                <li>Sự hòa hợp Chủ ngữ - Động từ trong cấu trúc "Not only... but also" (động từ chia theo chủ ngữ gần nhất).</li>
+                            </ul>
+                        </div>
+
+                        <!-- READING CLOZE -->
+                        <div class="guide-card bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+                            <div class="flex items-center gap-4 mb-4">
+                                <div class="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center text-xl"><i class="fa-solid fa-book-open-reader"></i></div>
+                                <div>
+                                    <h3 class="font-bold text-lg text-gray-800">3. Đọc điền từ (Split-View)</h3>
+                                    <span class="text-xs font-bold bg-indigo-100 text-indigo-800 px-2 py-1 rounded">Part V, VI (Câu 41 - 60)</span>
+                                </div>
+                            </div>
+                            <ul class="text-gray-600 space-y-2 text-sm list-disc pl-5 leading-relaxed">
+                                <li>Đọc lướt hiểu ngữ cảnh đoạn văn. Dựa vào từ loại hoặc giới từ đi kèm chỗ trống.</li>
+                                <li>Phần V là trắc nghiệm, áp dụng phương pháp loại trừ. Phần VI là tự luận, đòi hỏi tự suy luận từ vựng (ví dụ giới từ đi kèm ngày tháng: <i>on December 25th</i>).</li>
+                            </ul>
+                        </div>
+
+                        <!-- WRITING -->
+                        <div class="guide-card bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+                            <div class="flex items-center gap-4 mb-4">
+                                <div class="w-12 h-12 bg-rose-100 text-rose-600 rounded-full flex items-center justify-center text-xl"><i class="fa-solid fa-pen-nib"></i></div>
+                                <div>
+                                    <h3 class="font-bold text-lg text-gray-800">4. Kỹ năng Viết (Viết lại & Viết Thư)</h3>
+                                    <span class="text-xs font-bold bg-rose-100 text-rose-800 px-2 py-1 rounded">Part VII, VIII (Câu 61 - 71)</span>
+                                </div>
+                            </div>
+                            <ul class="text-gray-600 space-y-2 text-sm list-disc pl-5 leading-relaxed">
+                                <li><strong>Viết lại câu:</strong> Cần giữ nguyên nghĩa gốc. Áp dụng công thức chuyển đổi thì, câu trực tiếp - gián tiếp, cấu trúc "so...that", "There is no point in V-ing".</li>
+                                <li><strong>Viết thư:</strong> Thể hiện rõ các thông tin về Neighborhood của bạn. Viết câu ngắn gọn, mạch lạc, chia đoạn hợp lý và cẩn thận lỗi chính tả.</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-10 text-center pb-10">
+                        <button onclick="switchTab('test')" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-10 rounded-full shadow-xl transition transform hover:scale-105">
+                            <i class="fa-solid fa-play mr-2"></i> Bắt Đầu Làm Bài Ngay
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW: TEST (QUIZ) -->
+            <div id="content-test" class="hidden p-4 md:p-8">
+                <div class="max-w-6xl mx-auto">
+                    <form id="quizForm">
+                        <div id="questionsContainer" class="space-y-6">
+                            <!-- Questions Rendered Here -->
+                        </div>
+                        
+                        <div class="mt-12 pt-8 border-t-2 border-gray-200 text-center pb-10">
+                            <button type="button" onclick="gradeTest()" class="bg-blue-600 hover:bg-blue-800 text-white font-black py-4 px-16 rounded-full shadow-2xl transition transform hover:scale-105 text-xl tracking-wide">
+                                <i class="fa-solid fa-check-double mr-2"></i> NỘP BÀI & CHẤM ĐIỂM
+                            </button>
+                        </div>
+
+                        <div id="resultArea" class="hidden mt-10 p-8 md:p-12 rounded-3xl text-center border border-gray-100 bg-white shadow-2xl mb-10">
+                            <h3 class="text-3xl font-extrabold text-gray-800 mb-2">Kết Quả Của Bạn</h3>
+                            <div class="text-7xl font-black mb-6" id="scoreDisplay">0/70</div>
+                            <p class="text-xl text-gray-600 mb-10 font-medium leading-relaxed" id="messageDisplay"></p>
+                            <div class="flex flex-col sm:flex-row justify-center gap-4">
+                                <button type="button" onclick="resetTest()" class="px-8 py-4 border-2 border-blue-600 text-blue-700 font-bold rounded-full hover:bg-blue-50 transition shadow-sm text-lg">Làm Lại Bài Này</button>
+                                <button type="button" onclick="switchTab('flashcard')" class="px-8 py-4 bg-teal-600 text-white font-bold rounded-full hover:bg-teal-700 transition shadow-lg text-lg"><i class="fa-solid fa-layer-group mr-2"></i> Ôn Flashcard Ngay</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- VIEW: FLASHCARDS (SINGLE DECK) -->
+            <div id="content-flashcard" class="hidden p-4 md:p-8 bg-gray-50 h-full">
+                <div class="max-w-3xl mx-auto h-full flex flex-col">
+                    <div class="text-center mb-6 shrink-0">
+                        <h2 class="text-2xl md:text-3xl font-extrabold text-gray-800 mb-2"><i class="fa-solid fa-layer-group text-blue-500 mr-2"></i>Bộ Thẻ Từ Vựng Thông Minh</h2>
+                        <p class="text-gray-600 text-sm md:text-base">Mũi tên <kbd class="bg-gray-200 px-2 py-1 rounded shadow-sm text-xs">Trái</kbd> / <kbd class="bg-gray-200 px-2 py-1 rounded shadow-sm text-xs">Phải</kbd> để chuyển thẻ. Nhấn vào thẻ để lật.</p>
+                    </div>
+                    
+                    <!-- Single Flashcard Container -->
+                    <div class="flex-1 flex flex-col items-center justify-center min-h-[400px] pb-10">
+                        <div class="perspective-1000 w-full max-w-lg h-80 cursor-pointer group flip-card" id="flashcardElement" onclick="flipCard()">
+                            <div class="flip-card-inner relative w-full h-full transform-style-3d shadow-2xl rounded-[2rem] transition-transform duration-500 ease-out" id="flashcardInner">
+                                
+                                <!-- Front of Card -->
+                                <div class="backface-hidden absolute w-full h-full bg-white rounded-[2rem] flex flex-col items-center justify-center border border-gray-100 p-8 text-center shadow-lg">
+                                    <h3 class="text-4xl md:text-5xl font-black text-blue-700 mb-4 tracking-tight" id="fc-word">Word</h3>
+                                    <p class="text-gray-500 text-lg font-medium bg-gray-100 px-4 py-2 rounded-full" id="fc-pron">/pron/</p>
+                                    <div class="absolute bottom-6 text-blue-400 text-sm flex items-center gap-2 font-semibold">
+                                        <i class="fa-solid fa-hand-pointer animate-pulse"></i> Nhấn để xem nghĩa
+                                    </div>
+                                </div>
+                                
+                                <!-- Back of Card -->
+                                <div class="backface-hidden rotate-y-180 absolute w-full h-full bg-gradient-to-br from-blue-600 to-indigo-800 text-white rounded-[2rem] flex flex-col items-center justify-center p-8 shadow-2xl text-center">
+                                    <span class="bg-white/20 text-white text-sm font-bold px-4 py-1.5 rounded-full mb-4 uppercase tracking-wider shadow-sm" id="fc-type">Type</span>
+                                    <p class="text-3xl md:text-4xl font-bold mb-6 drop-shadow-md" id="fc-meaning">Meaning</p>
+                                    <div class="w-full h-px bg-white/30 mb-6"></div>
+                                    <p class="text-lg italic text-blue-50 font-light px-4 leading-relaxed" id="fc-example">"Example sentence goes here."</p>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <!-- Controls -->
+                        <div class="flex items-center justify-center gap-6 mt-10 w-full max-w-md">
+                            <button onclick="prevCard()" id="btnPrev" class="w-14 h-14 rounded-full bg-white text-gray-700 shadow-md hover:shadow-lg hover:text-blue-600 hover:bg-blue-50 transition flex items-center justify-center text-xl disabled:opacity-30 disabled:cursor-not-allowed border border-gray-100 focus:outline-none">
+                                <i class="fa-solid fa-chevron-left"></i>
+                            </button>
+                            
+                            <div class="bg-white px-6 py-3 rounded-full shadow-sm font-bold text-gray-600 text-lg border border-gray-100 min-w-[100px] text-center" id="fc-counter">
+                                1 / 23
+                            </div>
+                            
+                            <button onclick="nextCard()" id="btnNext" class="w-14 h-14 rounded-full bg-white text-gray-700 shadow-md hover:shadow-lg hover:text-blue-600 hover:bg-blue-50 transition flex items-center justify-center text-xl disabled:opacity-30 disabled:cursor-not-allowed border border-gray-100 focus:outline-none">
+                                <i class="fa-solid fa-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Global Hover Vocab Tooltip -->
+        <div id="vocabTooltip" class="fixed z-50 hidden bg-white rounded-xl shadow-2xl border border-gray-200 p-5 w-72 text-left pointer-events-auto transition-opacity duration-200 opacity-0 tooltip-arrow">
+            <div class="flex justify-between items-start mb-3">
+                <div class="pr-2">
+                    <h4 class="text-xl font-black text-blue-700 capitalize" id="tt-word">Word</h4>
+                    <p class="text-sm text-gray-500 font-medium mt-1" id="tt-pron">/pron/</p>
+                </div>
+                <button onclick="speakWord()" title="Nghe phát âm" class="shrink-0 w-10 h-10 bg-blue-50 hover:bg-blue-100 hover:scale-110 text-blue-600 rounded-full flex items-center justify-center transition shadow-sm border border-blue-100">
+                    <i class="fa-solid fa-volume-high"></i>
+                </button>
+            </div>
+            <span class="inline-block bg-indigo-100 text-indigo-800 text-xs font-bold px-2 py-1 rounded mb-3" id="tt-type">Type</span>
+            <p class="text-base text-gray-800 font-bold mb-3" id="tt-meaning">Meaning</p>
+            <p class="text-sm text-gray-600 italic border-l-4 border-blue-300 pl-3 leading-relaxed bg-blue-50/50 py-2 pr-2" id="tt-example">"Example"</p>
+        </div>
+
+    </main>
+
+    <script>
+        const passage3_v = `<div class="passage-content text-gray-700 text-base md:text-lg"><p><b class="text-blue-700 text-lg uppercase block mb-2">PART V - Choose the most suitable answer</b></p><p>Air pollution is a cause <b>(1)</b> ill health in human beings. In a lot of countries, there are <b>(2)</b> limiting the amount of smoke factories can produce although there is not enough <b>(3)</b> on the effects of smoke on the atmosphere. Doctors have <b>(4)</b> that air pollution causes <b>(5)</b> diseases. The gases from the exhausts of cars <b>(6)</b> also increased air pollution in most cities. The <b>(7)</b> of petrol produces a poisonous gas, which is often collected in busy streets circled by high buildings. Children <b>(8)</b> in areas where there is a lot of lead in the atmosphere can not think as <b>(9)</b> as other children, and are clumsy when they <b>(10)</b> their hands.</p></div>`;
+
+        const passage3_vi = `<div class="passage-content text-gray-700 text-base md:text-lg"><p><b class="text-blue-700 text-lg uppercase block mb-2">PART VI - Read and fill a suitable word</b></p><p>Christmas is always held <b>(1)</b> December the twenty fifth every year. Every family in England decorates a Christmas tree and puts <b>(2)</b> in the middle of the living room. And Santa Claus plays an important <b>(3)</b> in this festival.  There is a poem to relate him. In 1823, the patron saint of children, Saint Nicholas appeared in a poem <b>(4)</b> A Visit Saint Nicholas. The character in the poem <b>(5)</b> a fat jolly man who wore a <b>(6)</b> suit and gave children <b>(7)</b> on Christmas Eve. The poem, which was <b>(8)</b> by Clement Clarke Moore, an American professor, became popular <b>(9)</b> the USA. Santa Claus is based <b>(10)</b> the description of Saint Nicholas in this poem.</p></div>`;
+
+        const database = {
+            3: {
+                vocab: [
+                    { word: "championship", pron: "/ˈtʃæm.pi.ən.ʃɪp/", type: "n.", meaning: "Chức vô địch", example: "They won the championship." },
+                    { word: "communicate", pron: "/kəˈmjuː.nɪ.keɪt/", type: "v.", meaning: "Giao tiếp", example: "We communicate via email." },
+                    { word: "environment", pron: "/ɪnˈvaɪ.rən.mənt/", type: "n.", meaning: "Môi trường", example: "Protect the environment." },
+                    { word: "location", pron: "/ləʊˈkeɪ.ʃən/", type: "n.", meaning: "Vị trí, địa điểm", example: "A beautiful location." },
+                    { word: "scientist", pron: "/ˈsaɪən.tɪst/", type: "n.", meaning: "Nhà khoa học", example: "He is a famous scientist." },
+                    { word: "urbanized", pron: "/ˈɜː.bən.aɪzd/", type: "adj.", meaning: "Đô thị hóa", example: "The area has become highly urbanized." },
+                    { word: "contestant", pron: "/kənˈtes.tənt/", type: "n.", meaning: "Thí sinh", example: "There are many contestants." },
+                    { word: "absence", pron: "/ˈæb.səns/", type: "n.", meaning: "Sự vắng mặt", example: "Her absence was noticed." },
+                    { word: "hopeless", pron: "/ˈhəʊp.ləs/", type: "adj.", meaning: "Tuyệt vọng", example: "He felt hopeless." },
+                    { word: "laziness", pron: "/ˈleɪ.zi.nəs/", type: "n.", meaning: "Sự lười biếng", example: "He failed because of laziness." },
+                    { word: "product", pron: "/ˈprɒd.ʌkt/", type: "n.", meaning: "Sản phẩm", example: "New dairy products." },
+                    { word: "celebration", pron: "/ˌsel.əˈbreɪ.ʃən/", type: "n.", meaning: "Sự kỷ niệm, lễ hội", example: "A big celebration." },
+                    { word: "intelligent", pron: "/ɪnˈtel.ɪ.dʒənt/", type: "adj.", meaning: "Thông minh", example: "An intelligent boy." },
+                    { word: "careless", pron: "/ˈkeə.ləs/", type: "adj.", meaning: "Bất cẩn", example: "It was a careless mistake." },
+                    { word: "atmosphere", pron: "/ˈæt.mə.sfɪər/", type: "n.", meaning: "Bầu không khí", example: "The atmosphere is polluted." },
+                    { word: "disease", pron: "/dɪˈziːz/", type: "n.", meaning: "Căn bệnh", example: "Heart disease." },
+                    { word: "exhaust", pron: "/ɪɡˈzɔːst/", type: "n.", meaning: "Khí thải", example: "Car exhaust fumes." },
+                    { word: "poisonous", pron: "/ˈpɔɪ.zən.əs/", type: "adj.", meaning: "Có độc", example: "A poisonous gas." },
+                    { word: "decorate", pron: "/ˈdek.ə.reɪt/", type: "v.", meaning: "Trang trí", example: "Decorate the tree." },
+                    { word: "description", pron: "/dɪˈskrɪp.ʃən/", type: "n.", meaning: "Sự miêu tả", example: "A description of the man." },
+                    { word: "graceful", pron: "/ˈɡreɪs.fəl/", type: "adj.", meaning: "Duyên dáng", example: "A graceful dancer." },
+                    { word: "persuade", pron: "/pəˈsweɪd/", type: "v.", meaning: "Thuyết phục", example: "It's no use persuading her." },
+                    { word: "difficulty", pron: "/ˈdɪf.ɪ.kəl.ti/", type: "n.", meaning: "Sự khó khăn", example: "She had no difficulty doing it." }
+                ],
+                questions: [
+                    // PART II
+                    { id: 1, type: "text", text: "PART II - Choose the best answers to completes each sentence.<br>1. Hoa __________________ coins and stamps since she was six.", answer: ["has collected"] },
+                    { id: 2, type: "text", text: "2. His brother is a _________________ boy. He always tells a joke.", answer: ["humorous", "funny"] },
+                    { id: 3, type: "text", text: "3. Do you mind if I __________________ your car to work?", answer: ["take", "use", "borrow"] },
+                    { id: 4, type: "text", text: "4. They are ____________ that their son won the championship.", answer: ["proud", "happy", "glad"] },
+                    { id: 5, type: "text", text: "5. My sister regretting ___________ Mai’s glasses yesterday.", answer: ["breaking"] },
+                    { id: 6, type: "text", text: "6. Hoa dances more _______________ than her classmates.", answer: ["beautifully", "gracefully"] },
+                    { id: 7, type: "text", text: "7. They will hold a meeting in the large room ____________ the morning of next Sunday.", answer: ["on"] },
+                    { id: 8, type: "text", text: "8. Minh loves playing chess _____________ his sister enjoys skipping in their free time.", answer: ["while", "whereas", "but"] },
+                    { id: 9, type: "text", text: "9. One hundred dollars ______________ an big amount of money for her.", answer: ["is"] },
+                    { id: 10, type: "text", text: "10. Don’t overheat the victim _____________ blankets or coats.", answer: ["with"] },
+                    { id: 11, type: "text", text: "11. We are going to __________ a small plane to Ha Long Bay this weekend.", answer: ["take", "fly", "catch"] },
+                    { id: 12, type: "text", text: "12. They as well as Mai ___________________ in the field at this time last Sunday.", answer: ["were working", "were playing"] },
+                    { id: 13, type: "text", text: "13. Thanks _______ Alexander Graham Bell’s invention, I can communicate with each other easily.", answer: ["to"] },
+                    { id: 14, type: "text", text: "14. We must _________ the environment from the pollution every day.", answer: ["protect", "save"] },
+                    { id: 15, type: "text", text: "15. In our opinion, there are a lot of differences _________ two twins.", answer: ["between"] },
+                    { id: 16, type: "text", text: "16. If you _______________ your work, let’s play volleyball with them in the garden.", answer: ["finish", "complete"] },
+                    { id: 17, type: "text", text: "17. Have a picnic with ______________ in the mountain tomorrow.", answer: ["us", "them", "him", "her", "me"] },
+                    { id: 18, type: "text", text: "18. Study is no _____________  restricted to just one location.", answer: ["longer"] },
+                    { id: 19, type: "text", text: "19. My son was hit  _______________ a stick while he was working in the field.", answer: ["with", "by"] },
+                    { id: 20, type: "text", text: "20. Nam and Manh have played badminton for two hours, but __________ of them are tired.", answer: ["neither", "none"] },
+
+                    // PART III
+                    { id: 21, type: "text", text: "PART III - Put the correct form of the words:<br>1. Joanne wants to become a __________ in the future. (science)", answer: ["scientist"] },
+                    { id: 22, type: "text", text: "2. Many rural areas in Viet Nam have been __________ in the last few years. (urban)", answer: ["urbanized", "urbanised"] },
+                    { id: 23, type: "text", text: "3. The book was so ________ that we didn’t want to read it. (interest)", answer: ["uninteresting"] },
+                    { id: 24, type: "text", text: "4. There are a lot of _______________ in the competition. (contest)", answer: ["contestants", "participation"] },
+                    { id: 25, type: "text", text: "5. Linda’s __________ made the party less exciting. (absent)", answer: ["absence"] },
+                    { id: 26, type: "text", text: "6. He didn’t win the championship, so he felt very _____________ . (hope)", answer: ["hopeless"] },
+                    { id: 27, type: "text", text: "7. Because of his _________, they failed the exam. (lazy)", answer: ["laziness"] },
+                    { id: 28, type: "text", text: "8. Vinamilk company has served customers a lot of _____________ recently. (produce)", answer: ["products"] },
+                    { id: 29, type: "text", text: "9. Tet holiday is one of the most important __________ for Vietnamese people. (celebrate)", answer: ["celebrations"] },
+                    { id: 30, type: "text", text: "10. Laura loves all of Vietnamese dishes, _______________ Nem. (special)", answer: ["especially"] },
+
+                    // PART IV
+                    { id: 31, type: "text", text: "PART IV - Find and correct a mistake in each sentence (Type the corrected phrase/sentence):<br>1. The boy was enough intelligent to solve that problem.", answer: ["intelligent enough", "The boy was intelligent enough to solve that problem."] },
+                    { id: 32, type: "text", text: "2. The girl helped me with the needlework yesterday is my classmate.", answer: ["helping", "who helped", "The girl helping me with the needlework yesterday is my classmate.", "The girl who helped me with the needlework yesterday is my classmate."] },
+                    { id: 33, type: "text", text: "3. They asked their friends not play soccer in the road.", answer: ["not to play", "They asked their friends not to play soccer in the road."] },
+                    { id: 34, type: "text", text: "4. Hanh is the same weigh as my sister.", answer: ["weight", "Hanh is the same weight as my sister."] },
+                    { id: 35, type: "text", text: "5. It is careless for you to leave your book on the train.", answer: ["of you", "careless of you", "It is careless of you to leave your book on the train."] },
+                    { id: 36, type: "text", text: "6. My brother used to going to the movies with our father.", answer: ["go", "used to go", "My brother used to go to the movies with our father."] },
+                    { id: 37, type: "text", text: "7. Hoa asked me if I could have a picnic with her in the country or not.", answer: ["whether", "Hoa asked me whether I could have a picnic with her in the country or not."] },
+                    { id: 38, type: "text", text: "8. Most of monkeys both in the forest and in the zoo are interesting in bananas.", answer: ["interested", "interested in", "Most of monkeys both in the forest and in the zoo are interested in bananas."] },
+                    { id: 39, type: "text", text: "9. It takes Nam thirty minutes going to school on foot everyday.", answer: ["to go", "It takes Nam thirty minutes to go to school on foot everyday."] },
+                    { id: 40, type: "text", text: "10. Not only Ha but also her friends was present in my fifteenth birthday party.", answer: ["were", "were present", "Not only Ha but also her friends were present in my fifteenth birthday party."] },
+
+                    // PART V
+                    { id: 41, type: "mcq", passageId: 3, passageText: passage3_v, text: "Choose word for blank (1):", options: { A: "from", B: "on", C: "over", D: "of" }, answer: "D" },
+                    { id: 42, type: "mcq", passageId: 3, passageText: passage3_v, text: "Choose word for blank (2):", options: { A: "laws", B: "ideas", C: "problems", D: "regulations" }, answer: "A" },
+                    { id: 43, type: "mcq", passageId: 3, passageText: passage3_v, text: "Choose word for blank (3):", options: { A: "news", B: "article", C: "information", D: "newspaper" }, answer: "C" },
+                    { id: 44, type: "mcq", passageId: 3, passageText: passage3_v, text: "Choose word for blank (4):", options: { A: "agreed", B: "pointed", C: "disagreed", D: "proved" }, answer: "D" },
+                    { id: 45, type: "mcq", passageId: 3, passageText: passage3_v, text: "Choose word for blank (5):", options: { A: "lung", B: "heart", C: "liver", D: "stomach" }, answer: "A" },
+                    { id: 46, type: "mcq", passageId: 3, passageText: passage3_v, text: "Choose word for blank (6):", options: { A: "had", B: "have", C: "has", D: "having" }, answer: "B" },
+                    { id: 47, type: "mcq", passageId: 3, passageText: passage3_v, text: "Choose word for blank (7):", options: { A: "water", B: "lead", C: "gas", D: "exhaust" }, answer: "B" },
+                    { id: 48, type: "mcq", passageId: 3, passageText: passage3_v, text: "Choose word for blank (8):", options: { A: "lived", B: "live", C: "to live", D: "living" }, answer: "D" },
+                    { id: 49, type: "mcq", passageId: 3, passageText: passage3_v, text: "Choose word for blank (9):", options: { A: "quick", B: "slowly", C: "quickly", D: "slow" }, answer: "C" },
+                    { id: 50, type: "mcq", passageId: 3, passageText: passage3_v, text: "Choose word for blank (10):", options: { A: "touch", B: "use", C: "handle", D: "collect" }, answer: "B" },
+
+                    // PART VI
+                    { id: 51, type: "text", passageId: 4, passageText: passage3_vi, text: "Điền từ thích hợp cho ô (1):", answer: ["on"] },
+                    { id: 52, type: "text", passageId: 4, passageText: passage3_vi, text: "Điền từ thích hợp cho ô (2):", answer: ["it"] },
+                    { id: 53, type: "text", passageId: 4, passageText: passage3_vi, text: "Điền từ thích hợp cho ô (3):", answer: ["role", "part"] },
+                    { id: 54, type: "text", passageId: 4, passageText: passage3_vi, text: "Điền từ thích hợp cho ô (4):", answer: ["called", "named"] },
+                    { id: 55, type: "text", passageId: 4, passageText: passage3_vi, text: "Điền từ thích hợp cho ô (5):", answer: ["was", "is"] },
+                    { id: 56, type: "text", passageId: 4, passageText: passage3_vi, text: "Điền từ thích hợp cho ô (6):", answer: ["red"] },
+                    { id: 57, type: "text", passageId: 4, passageText: passage3_vi, text: "Điền từ thích hợp cho ô (7):", answer: ["presents", "gifts"] },
+                    { id: 58, type: "text", passageId: 4, passageText: passage3_vi, text: "Điền từ thích hợp cho ô (8):", answer: ["written"] },
+                    { id: 59, type: "text", passageId: 4, passageText: passage3_vi, text: "Điền từ thích hợp cho ô (9):", answer: ["in"] },
+                    { id: 60, type: "text", passageId: 4, passageText: passage3_vi, text: "Điền từ thích hợp cho ô (10):", answer: ["on"] },
+
+                    // PART VII
+                    { id: 61, type: "text", text: "PART VII - Complete the second sentence so that it has a similar meaning:<br>1. It is over two years since they left their homeland.<br>(They haven’t ...)", answer: ["come back their homeland for over two years", "returned to their homeland for over two years", "been back to their homeland for over two years"] },
+                    { id: 62, type: "text", text: "2. “How many cars are there in front of your house, Mai?” I said<br>(I asked ...)", answer: ["Mai how many cars there were in front of her house"] },
+                    { id: 63, type: "text", text: "3. No one introduced me to newcomers in the festival.<br>(I ...)", answer: ["wasn't introduced to newcomers in the festival", "was not introduced to newcomers in the festival"] },
+                    { id: 64, type: "text", text: "4. The food was too bad for the children to eat.<br>(The food was so ...)", answer: ["bad that the children couldn't eat it", "bad that the children could not eat it"] },
+                    { id: 65, type: "text", text: "5. It’s no use persuading her to join in that activity.<br>(There is no ...)", answer: ["point in persuading her to join in that activity"] },
+                    { id: 66, type: "text", text: "6. I am on the fifth page of the essay I am typing.<br>(So far ...)", answer: ["I have typed five pages of the essay"] },
+                    { id: 67, type: "text", text: "7. The dog keeps stealing my socks.<br>(The dog is ...)", answer: ["always stealing my socks"] },
+                    { id: 68, type: "text", text: "8. Hoa found it easy to translate this poem into French.<br>(Hoa had no ...)", answer: ["difficulty in translating this poem into French", "difficulty translating this poem into French"] },
+                    { id: 69, type: "text", text: "9. Collect all of dirty clothes by 8 o’clock tomorrow morning.<br>(Let all ...)", answer: ["of dirty clothes be collected by 8 o'clock tomorrow morning", "dirty clothes be collected by 8 o'clock tomorrow morning"] },
+                    { id: 70, type: "text", text: "10. Mary is the most graceful girl at school.<br>(No girl ...)", answer: ["at school is as graceful as Mary"] },
+
+                    // PART VIII
+                    { id: 71, type: "textarea", text: "PART VIII - Write a letter about 150 – 200 words to a pen friend about your neighborhood.", answer: ["(Câu hỏi mở) Mẫu tham khảo: Dear John, I'm writing to tell you about my neighborhood. I live in a very peaceful and beautiful area. There are lots of trees and a big park where I usually go jogging every morning. The people here are incredibly friendly and helpful; we often have small gatherings on weekends. It's a great place to live, and I hope you can visit me someday. Best wishes!"] }
+                ]
+            }
+        };
+
+        let currentTestId = 3;
+        let vocabList = database[currentTestId].vocab;
+        let currentVocabIndex = 0;
+        let currentSpeechWord = '';
+
+        // Initialize App
+        function initApp() {
+            renderTest();
+            updateFlashcardView();
+            setupTooltipHoverEvents();
+            
+            // Add keyboard navigation for flashcards
+            document.addEventListener('keydown', (e) => {
+                if (document.getElementById('content-flashcard').classList.contains('hidden') === false) {
+                    if (e.key === 'ArrowRight') nextCard();
+                    if (e.key === 'ArrowLeft') prevCard();
+                    if (e.key === ' ' || e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+                        e.preventDefault();
+                        flipCard();
+                    }
+                }
+            });
+        }
+
+        // Toggle Sidebar
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            sidebar.classList.toggle('-translate-x-full');
+            overlay.classList.toggle('hidden');
+        }
+
+        // Feature: Automatically wrap known vocabulary in passage HTML
+        function annotateHTML(htmlString, vocabList) {
+            if (!vocabList || vocabList.length === 0) return htmlString;
+            
+            const sortedWords = [...vocabList].sort((a,b) => b.word.length - a.word.length);
+            const escapeRegExp = (string) => string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            const wordsPattern = sortedWords.map(v => escapeRegExp(v.word)).join('|');
+            const combinedRegex = new RegExp(`\\b(${wordsPattern})\\b`, 'gi');
+            
+            const div = document.createElement('div');
+            div.innerHTML = htmlString;
+            
+            function walk(node) {
+                if (node.nodeType === 3) { // Text node
+                    const originalText = node.nodeValue;
+                    const replacedText = originalText.replace(combinedRegex, `<span class="annotated-word font-bold text-blue-700 border-b-2 border-dashed border-blue-400 cursor-help hover:bg-blue-100 transition-colors rounded px-0.5" data-word="$1">$&</span>`);
+                    if (originalText !== replacedText) {
+                        const span = document.createElement('span');
+                        span.innerHTML = replacedText;
+                        node.replaceWith(...Array.from(span.childNodes));
+                    }
+                } else if (node.nodeType === 1 && !node.classList.contains('annotated-word')) {
+                    Array.from(node.childNodes).forEach(walk);
+                }
+            }
+            Array.from(div.childNodes).forEach(walk);
+            return div.innerHTML;
+        }
+
+        function buildQuestionBlock(q, index, vocabList) {
+            let cleanText = q.text.replace(/Question \d+[\.:]?/gi, '').trim();
+            let annotatedText = vocabList ? annotateHTML(cleanText, vocabList) : cleanText;
+
+            let html = `
+                <div class="question-block bg-white p-4 md:p-6 rounded-xl border border-gray-100 shadow-sm" id="block-q${q.id}">
+                    <p class="font-medium text-base md:text-lg mb-4 leading-relaxed"><span class="bg-blue-100 text-blue-800 font-bold px-2 py-1 rounded text-sm mr-2 shadow-sm">Câu ${index + 1}</span> ${annotatedText}</p>
+            `;
+
+            if (q.type === 'text') {
+                html += `
+                    <div class="mt-3 md:pl-8">
+                        <input type="text" id="q${q.id}" class="w-full px-4 py-3 rounded-lg border-2 border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition text-gray-700 text-base shadow-inner" placeholder="Nhập câu trả lời..." autocomplete="off">
+                    </div>
+                `;
+            } else if (q.type === 'textarea') {
+                html += `
+                    <div class="mt-3 md:pl-8">
+                        <textarea id="q${q.id}" rows="6" class="w-full px-4 py-3 rounded-lg border-2 border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition text-gray-700 text-base shadow-inner resize-y" placeholder="Viết đoạn văn của bạn vào đây..."></textarea>
+                    </div>
+                `;
+            } else {
+                html += `<div class="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4 md:pl-8">`;
+                for (const [key, val] of Object.entries(q.options)) {
+                    if(!val) continue; 
+                    let annotatedVal = vocabList ? annotateHTML(val, vocabList) : val;
+                    html += `
+                        <label class="flex items-start cursor-pointer p-3 rounded-lg border border-gray-200 hover:border-blue-400 hover:bg-blue-50 transition bg-white shadow-sm">
+                            <input type="radio" name="q${q.id}" value="${key}" class="mt-1.5 mr-3 w-4 h-4 text-blue-600 focus:ring-blue-500 flex-shrink-0"> 
+                            <span class="text-gray-700 leading-snug"><strong class="mr-2 text-gray-900 uppercase">${key}.</strong> ${annotatedVal}</span>
+                        </label>
+                    `;
+                }
+                html += `</div>`;
+            }
+
+            html += `
+                    <div class="hidden mt-4 text-base px-4 py-3 rounded-lg" id="feedback-q${q.id}"></div>
+                </div>
+            `;
+            return html;
+        }
+
+        // Render Test
+        function renderTest() {
+            const testData = database[currentTestId];
+            const qContainer = document.getElementById('questionsContainer');
+            let qHtml = '';
+            let i = 0;
+            let annotatedPassages = {}; 
+
+            while (i < testData.questions.length) {
+                const q = testData.questions[i];
+                
+                if (q.passageText) {
+                    let pId = q.passageId;
+                    let passageQuestions = [];
+                    
+                    while (i < testData.questions.length && testData.questions[i].passageId === pId) {
+                        passageQuestions.push(testData.questions[i]);
+                        i++;
+                    }
+                    
+                    if (!annotatedPassages[pId]) {
+                        annotatedPassages[pId] = annotateHTML(q.passageText, testData.vocab);
+                    }
+                    
+                    qHtml += `
+                        <div class="my-8 bg-blue-50/50 p-4 md:p-6 rounded-2xl border border-blue-100 shadow-sm">
+                            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 relative">
+                                <!-- Left Column: Sticky Passage -->
+                                <div class="lg:sticky lg:top-4 bg-white p-5 md:p-6 rounded-xl border border-gray-200 shadow-inner h-fit max-h-[50vh] lg:max-h-[75vh] overflow-y-auto">
+                                    <h4 class="font-black text-blue-700 mb-4 border-b-2 border-blue-100 pb-2 uppercase tracking-wide flex items-center justify-between">
+                                        <div class="flex items-center"><i class="fa-solid fa-book-open-reader mr-2 text-xl"></i>ĐOẠN VĂN</div>
+                                        <span class="text-xs font-normal text-gray-400 normal-case bg-gray-100 px-2 py-1 rounded">Rê chuột vào từ bôi xanh</span>
+                                    </h4>
+                                    ${annotatedPassages[pId]}
+                                </div>
+                                <!-- Right Column: Questions -->
+                                <div class="space-y-4 md:space-y-6">
+                    `;
+                    passageQuestions.forEach((pq) => {
+                        let originalIndex = testData.questions.findIndex(item => item.id === pq.id);
+                        qHtml += buildQuestionBlock(pq, originalIndex, testData.vocab);
+                    });
+                    qHtml += `
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    qHtml += buildQuestionBlock(q, i, testData.vocab);
+                    i++;
+                }
+            }
+            
+            qContainer.innerHTML = qHtml;
+            switchTab('guide');
+        }
+
+        // Text-to-Speech implementation
+        function speakWord(word = currentSpeechWord) {
+            if (!word) return;
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(word);
+                utterance.lang = 'en-US';
+                window.speechSynthesis.speak(utterance);
+            } else {
+                alert("Trình duyệt của bạn không hỗ trợ phát âm (Web Speech API).");
+            }
+        }
+
+        // Hover Tooltip Logic
+        function setupTooltipHoverEvents() {
+            let tooltipTimeout;
+            const tooltip = document.getElementById('vocabTooltip');
+
+            document.addEventListener('mouseover', (e) => {
+                const target = e.target.closest('.annotated-word');
+                if (target) {
+                    clearTimeout(tooltipTimeout);
+                    const word = target.dataset.word;
+                    const wordObj = vocabList.find(v => v.word.toLowerCase() === word.toLowerCase());
+                    
+                    if (wordObj) {
+                        showTooltip(target, wordObj);
+                    }
+                } else if (e.target.closest('#vocabTooltip')) {
+                    clearTimeout(tooltipTimeout);
+                } else {
+                    tooltipTimeout = setTimeout(() => {
+                        tooltip.classList.add('opacity-0');
+                        setTimeout(() => tooltip.classList.add('hidden'), 200);
+                    }, 300);
+                }
+            });
+
+            document.addEventListener('mouseout', (e) => {
+                if (e.target.closest('.annotated-word') || e.target.closest('#vocabTooltip')) {
+                    tooltipTimeout = setTimeout(() => {
+                        tooltip.classList.add('opacity-0');
+                        setTimeout(() => tooltip.classList.add('hidden'), 200);
+                    }, 300);
+                }
+            });
+        }
+
+        function showTooltip(el, wordObj) {
+            const tooltip = document.getElementById('vocabTooltip');
+            tooltip.classList.remove('hidden');
+            
+            document.getElementById('tt-word').textContent = wordObj.word;
+            document.getElementById('tt-pron').textContent = wordObj.pron;
+            document.getElementById('tt-type').textContent = wordObj.type;
+            document.getElementById('tt-meaning').textContent = wordObj.meaning;
+            document.getElementById('tt-example').textContent = `"${wordObj.example}"`;
+            
+            currentSpeechWord = wordObj.word;
+
+            const rect = el.getBoundingClientRect();
+            const ttRect = tooltip.getBoundingClientRect();
+            
+            let top = rect.bottom + 10;
+            let left = rect.left - 20;
+
+            if (top + ttRect.height > window.innerHeight) {
+                top = rect.top - ttRect.height - 10;
+                tooltip.classList.remove('tooltip-arrow');
+            } else {
+                tooltip.classList.add('tooltip-arrow');
+            }
+
+            if (left + ttRect.width > window.innerWidth) {
+                left = window.innerWidth - ttRect.width - 20;
+            }
+            if (left < 10) {
+                left = 10;
+            }
+            
+            tooltip.style.top = `${top}px`;
+            tooltip.style.left = `${left}px`;
+            
+            requestAnimationFrame(() => {
+                tooltip.classList.remove('opacity-0');
+            });
+        }
+
+        // Tab Switching Logic
+        function switchTab(tab) {
+            const btnGuide = document.getElementById('tab-guide');
+            const btnTest = document.getElementById('tab-test');
+            const btnFlashcard = document.getElementById('tab-flashcard');
+            
+            const contentGuide = document.getElementById('content-guide');
+            const contentTest = document.getElementById('content-test');
+            const contentFlashcard = document.getElementById('content-flashcard');
+
+            [btnGuide, btnTest, btnFlashcard].forEach(btn => {
+                btn.className = "py-3 px-4 md:px-6 text-gray-500 hover:text-blue-600 font-semibold focus:outline-none flex items-center gap-2 transition-colors whitespace-nowrap";
+            });
+            [contentGuide, contentTest, contentFlashcard].forEach(content => {
+                content.classList.add('hidden');
+            });
+
+            const activeClasses = "py-3 px-4 md:px-6 text-blue-700 border-b-2 border-blue-600 font-bold focus:outline-none flex items-center gap-2 bg-white whitespace-nowrap";
+            if (tab === 'guide') {
+                btnGuide.className = activeClasses;
+                contentGuide.classList.remove('hidden');
+            } else if (tab === 'test') {
+                btnTest.className = activeClasses;
+                contentTest.classList.remove('hidden');
+            } else if (tab === 'flashcard') {
+                btnFlashcard.className = activeClasses;
+                contentFlashcard.classList.remove('hidden');
+            }
+            
+            document.getElementById('mainScrollContainer').scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Flashcard Logic
+        function updateFlashcardView() {
+            const v = vocabList[currentVocabIndex];
+            
+            document.getElementById('flashcardElement').classList.remove('flipped');
+            
+            setTimeout(() => {
+                document.getElementById('fc-word').textContent = v.word;
+                document.getElementById('fc-pron').textContent = v.pron;
+                document.getElementById('fc-type').textContent = v.type;
+                document.getElementById('fc-meaning').textContent = v.meaning;
+                document.getElementById('fc-example').textContent = `"${v.example}"`;
+                
+                document.getElementById('fc-counter').textContent = `${currentVocabIndex + 1} / ${vocabList.length}`;
+                
+                document.getElementById('btnPrev').disabled = currentVocabIndex === 0;
+                document.getElementById('btnNext').disabled = currentVocabIndex === vocabList.length - 1;
+            }, 150);
+        }
+
+        function flipCard() {
+            document.getElementById('flashcardElement').classList.toggle('flipped');
+        }
+
+        function nextCard() {
+            if (currentVocabIndex < vocabList.length - 1) {
+                currentVocabIndex++;
+                updateFlashcardView();
+            }
+        }
+
+        function prevCard() {
+            if (currentVocabIndex > 0) {
+                currentVocabIndex--;
+                updateFlashcardView();
+            }
+        }
+
+        // Grading Logic
+        function normalizeString(str) {
+            // Remove double quotes, trailing punctuation, and extra spaces
+            return str.toLowerCase().replace(/['"“”]/g, '').replace(/\s+/g, ' ').trim().replace(/[.!?]$/, '');
+        }
+
+        function gradeTest() {
+            const test = database[currentTestId];
+            let score = 0;
+            // Count total scoreable questions (exclude textarea)
+            const total = test.questions.filter(q => q.type !== 'textarea').length;
+
+            test.questions.forEach(q => {
+                const feedbackDiv = document.getElementById(`feedback-q${q.id}`);
+                feedbackDiv.classList.remove('hidden');
+
+                if (q.type === 'textarea') {
+                    // Provide sample answer for textarea without grading
+                    const validAnswers = Array.isArray(q.answer) ? q.answer : [q.answer];
+                    feedbackDiv.innerHTML = `<div class="bg-blue-50 text-blue-800 border-l-4 border-blue-500 p-4 rounded"><i class="fa-solid fa-lightbulb mr-2"></i><strong>${validAnswers[0]}</strong></div>`;
+                } else if (q.type === 'text') {
+                    // Grade Text Input
+                    const inputEl = document.getElementById(`q${q.id}`);
+                    const userAns = inputEl ? inputEl.value : "";
+                    
+                    if (userAns.trim()) {
+                        const normalizedUser = normalizeString(userAns);
+                        const validAnswers = Array.isArray(q.answer) ? q.answer : [q.answer];
+                        
+                        const isCorrect = validAnswers.some(ans => normalizeString(ans) === normalizedUser);
+                        
+                        if (isCorrect) {
+                            score++;
+                            feedbackDiv.innerHTML = `<div class="bg-green-100 text-green-800 border-l-4 border-green-500 p-3 rounded"><i class="fa-solid fa-circle-check mr-2"></i><strong>Chính xác!</strong></div>`;
+                            inputEl.classList.add('border-green-500', 'bg-green-50');
+                            inputEl.classList.remove('border-gray-200');
+                        } else {
+                            feedbackDiv.innerHTML = `<div class="bg-red-100 text-red-800 border-l-4 border-red-500 p-3 rounded"><i class="fa-solid fa-circle-xmark mr-2"></i><strong>Sai.</strong> Đáp án tham khảo: <strong>${validAnswers[0]}</strong></div>`;
+                            inputEl.classList.add('border-red-500', 'bg-red-50');
+                            inputEl.classList.remove('border-gray-200');
+                        }
+                    } else {
+                        const validAnswers = Array.isArray(q.answer) ? q.answer : [q.answer];
+                        feedbackDiv.innerHTML = `<div class="bg-yellow-100 text-yellow-800 border-l-4 border-yellow-500 p-3 rounded"><i class="fa-solid fa-triangle-exclamation mr-2"></i>Bạn chưa điền đáp án. Đáp án tham khảo: <strong>${validAnswers[0]}</strong></div>`;
+                    }
+                } else {
+                    // Grade Multiple Choice
+                    const selected = document.querySelector(`input[name="q${q.id}"]:checked`);
+                    
+                    if (selected) {
+                        if (selected.value === q.answer) {
+                            score++;
+                            feedbackDiv.innerHTML = `<div class="bg-green-100 text-green-800 border-l-4 border-green-500 p-3 rounded"><i class="fa-solid fa-circle-check mr-2"></i><strong>Chính xác!</strong> Đáp án đúng là <strong>${q.answer.toUpperCase()}</strong>.</div>`;
+                        } else {
+                            feedbackDiv.innerHTML = `<div class="bg-red-100 text-red-800 border-l-4 border-red-500 p-3 rounded"><i class="fa-solid fa-circle-xmark mr-2"></i><strong>Sai.</strong> Bạn chọn ${selected.value.toUpperCase()}, đáp án chuẩn là <strong>${q.answer.toUpperCase()}</strong>.</div>`;
+                        }
+                    } else {
+                        feedbackDiv.innerHTML = `<div class="bg-yellow-100 text-yellow-800 border-l-4 border-yellow-500 p-3 rounded"><i class="fa-solid fa-triangle-exclamation mr-2"></i>Chưa chọn đáp án. Đáp án đúng là <strong>${q.answer.toUpperCase()}</strong>.</div>`;
+                    }
+                }
+            });
+
+            // Show result
+            const resultArea = document.getElementById('resultArea');
+            const scoreDisplay = document.getElementById('scoreDisplay');
+            const messageDisplay = document.getElementById('messageDisplay');
+
+            resultArea.classList.remove('hidden');
+            scoreDisplay.textContent = `${score}/${total}`;
+
+            const percent = score / total;
+            if (percent >= 0.8) {
+                scoreDisplay.className = "text-6xl md:text-7xl font-black mb-4 text-green-600";
+                messageDisplay.textContent = "Tuyệt Vời! Bạn đã nắm rất vững kiến thức đề này.";
+            } else if (percent >= 0.5) {
+                scoreDisplay.className = "text-6xl md:text-7xl font-black mb-4 text-yellow-500";
+                messageDisplay.textContent = "Khá Tốt! Đề thi này khá dài, hãy ôn tập kỹ hơn phần Tự luận nhé.";
+            } else {
+                scoreDisplay.className = "text-6xl md:text-7xl font-black mb-4 text-red-600";
+                messageDisplay.textContent = "Cần cố gắng thêm! Phần Viết lại câu và Chia động từ khá khó. Hãy đọc kỹ phần 'Hướng Dẫn'.";
+            }
+            
+            resultArea.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
+
+        function resetTest() {
+            const form = document.getElementById('quizForm');
+            form.reset();
+            
+            // Remove colors from text inputs
+            const textInputs = document.querySelectorAll('input[type="text"], textarea');
+            textInputs.forEach(input => {
+                input.classList.remove('border-green-500', 'bg-green-50', 'border-red-500', 'bg-red-50');
+                input.classList.add('border-gray-200');
+            });
+
+            const feedbacks = document.querySelectorAll('[id^="feedback-q"]');
+            feedbacks.forEach(div => div.classList.add('hidden'));
+            document.getElementById('resultArea').classList.add('hidden');
+            document.getElementById('mainScrollContainer').scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Start App
+        initApp();
+    </script>
+</body>
+</html>
