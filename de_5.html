@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>English Practice 7 - Interactive</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f3f4f6;
+            scroll-behavior: smooth;
+        }
+
+        /* Flashcard CSS */
+        .flashcard-container {
+            perspective: 1000px;
+        }
+        .flashcard {
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+            cursor: pointer;
+        }
+        .flashcard.flipped {
+            transform: rotateY(180deg);
+        }
+        .flashcard-front, .flashcard-back {
+            backface-visibility: hidden;
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            padding: 1rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        .flashcard-front {
+            background-color: #ffffff;
+            color: #1f2937;
+            border: 2px solid #2563eb;
+        }
+        .flashcard-back {
+            background-color: #2563eb;
+            color: white;
+            transform: rotateY(180deg);
+        }
+
+        /* Custom inputs */
+        .text-input {
+            border: none;
+            border-bottom: 2px solid #9ca3af;
+            background: transparent;
+            outline: none;
+            padding: 0 5px;
+            text-align: center;
+            font-weight: 600;
+            color: #111827;
+            transition: all 0.3s;
+        }
+        .text-input:focus {
+            border-bottom-color: #2563eb;
+        }
+        .long-input { min-width: 280px; width: 100%; text-align: left; }
+        .short-input { min-width: 80px; }
+
+        /* Tooltip */
+        .has-tooltip {
+            position: relative;
+            cursor: help;
+            border-bottom: 1px dashed #2563eb;
+            color: #2563eb;
+            font-weight: 500;
+        }
+        .tooltip-text {
+            visibility: hidden;
+            background-color: #1f2937;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px 10px;
+            position: absolute;
+            z-index: 10;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 0.875rem;
+            white-space: nowrap;
+        }
+        .has-tooltip:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+    </style>
+</head>
+<body class="antialiased pb-24">
+
+    <!-- Header -->
+    <header class="bg-blue-700 text-white shadow-md sticky top-0 z-50">
+        <div class="max-w-5xl mx-auto px-4 py-4 flex justify-between items-center">
+            <div>
+                <h1 class="text-2xl md:text-3xl font-bold tracking-wider">ENGLISH PRACTICE 7</h1>
+                <p class="text-blue-100 text-sm mt-1">Interactive Test System</p>
+            </div>
+            <div id="score-display" class="hidden bg-white text-blue-700 font-bold px-4 py-2 rounded-lg shadow text-lg">
+                Điểm: <span id="score-val">0</span> / 10
+            </div>
+        </div>
+    </header>
+
+    <div class="max-w-5xl mx-auto mt-8 px-4">
+        
+        <!-- Tab Navigation -->
+        <div class="flex space-x-2 mb-6 border-b border-gray-300">
+            <button onclick="switchTab('flashcards')" id="tab-flashcards" class="px-6 py-3 font-semibold text-gray-500 hover:text-blue-600 border-b-2 border-transparent transition-colors">Học Từ Vựng</button>
+            <button onclick="switchTab('test')" id="tab-test" class="px-6 py-3 font-semibold text-blue-600 border-b-2 border-blue-600 transition-colors">Làm Bài Kiểm Tra</button>
+        </div>
+
+        <!-- FLASHCARDS SECTION -->
+        <div id="flashcards-section" class="hidden animate-fade-in">
+            <div class="bg-white p-6 rounded-2xl shadow-sm mb-8 text-center">
+                <h2 class="text-2xl font-bold text-gray-800 mb-2">Từ Vựng Quan Trọng</h2>
+                <p class="text-gray-500 mb-6">Nhấp vào thẻ để xem nghĩa tiếng Việt</p>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-6" id="flashcard-grid"></div>
+            </div>
+        </div>
+
+        <!-- TEST SECTION -->
+        <div id="test-section" class="space-y-8 animate-fade-in">
+
+            <div class="bg-white p-6 md:p-10 shadow-lg rounded-2xl">
+                
+                <!-- SECTION I -->
+                <h2 class="text-2xl font-extrabold text-blue-800 border-b-4 border-blue-200 pb-2 mb-8 uppercase">I. Section One: Vocabulary and Structures</h2>
+
+                <!-- Q1. MCQs -->
+                <section class="mb-10">
+                    <h3 class="text-lg font-bold text-blue-700 mb-4">Question 1: Choose the best answers</h3>
+                    <div class="space-y-6">
+                        <div class="q-item" data-type="mcq" data-answer="D" data-explain="'can't be' dùng để suy luận chắc chắn không thể xảy ra ở hiện tại.">
+                            <p class="font-semibold mb-2">1. Don’t be silly! That ...................................possibly be Rivaldo!</p>
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-2"><label><input type="radio" name="I1_1" value="A"> a. mustn’t</label><label><input type="radio" name="I1_1" value="B"> b. shouldn’t</label><label><input type="radio" name="I1_1" value="C"> c. won’t</label><label><input type="radio" name="I1_1" value="D"> d. can’t</label></div>
+                            <div class="explanation hidden mt-3 p-3 bg-blue-50 text-blue-800 text-sm rounded-lg border border-blue-200"></div>
+                        </div>
+                        <div class="q-item" data-type="mcq" data-answer="A" data-explain="Cấu trúc đảo ngữ: No sooner + had + S + V3/ed + than + S + V2/ed (Vừa mới... thì...).">
+                            <p class="font-semibold mb-2">2. No sooner had we started the game, .........................it began to rain.</p>
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-2"><label><input type="radio" name="I1_2" value="A"> a. than</label><label><input type="radio" name="I1_2" value="B"> b. then</label><label><input type="radio" name="I1_2" value="C"> c. that</label><label><input type="radio" name="I1_2" value="D"> d. and</label></div>
+                            <div class="explanation hidden mt-3 p-3 bg-blue-50 text-blue-800 text-sm rounded-lg border border-blue-200"></div>
+                        </div>
+                        <div class="q-item" data-type="mcq" data-answer="D" data-explain="used to + V: Thói quen/tình trạng trong quá khứ (khi còn là một đứa trẻ).">
+                            <p class="font-semibold mb-2">3. I ..................................be interested in playing badminton as a child.</p>
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-2"><label><input type="radio" name="I1_3" value="A"> a. could</label><label><input type="radio" name="I1_3" value="B"> b. ought to</label><label><input type="radio" name="I1_3" value="C"> c. might</label><label><input type="radio" name="I1_3" value="D"> d. used to</label></div>
+                            <div class="explanation hidden mt-3 p-3 bg-blue-50 text-blue-800 text-sm rounded-lg border border-blue-200"></div>
+                        </div>
+                        <div class="q-item" data-type="mcq" data-answer="C" data-explain="Thành ngữ: 'time and time again' = lặp đi lặp lại nhiều lần.">
+                            <p class="font-semibold mb-2">4. They’ve told you time and time ............................. not to go out at night.</p>
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-2"><label><input type="radio" name="I1_4" value="A"> a. to</label><label><input type="radio" name="I1_4" value="B"> b. over</label><label><input type="radio" name="I1_4" value="C"> c. again</label><label><input type="radio" name="I1_4" value="D"> d. before</label></div>
+                            <div class="explanation hidden mt-3 p-3 bg-blue-50 text-blue-800 text-sm rounded-lg border border-blue-200"></div>
+                        </div>
+                        <div class="q-item" data-type="mcq" data-answer="C" data-explain="'had to' chỉ sự bắt buộc trong quá khứ. (Xin lỗi tôi đến trễ, nhưng tôi ĐÃ PHẢI cho con ăn).">
+                            <p class="font-semibold mb-2">5. Sorry I’m late, but I..............................feed my little son before leaving home.</p>
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-2"><label><input type="radio" name="I1_5" value="A"> a. needed</label><label><input type="radio" name="I1_5" value="B"> b. must</label><label><input type="radio" name="I1_5" value="C"> c. had to</label><label><input type="radio" name="I1_5" value="D"> d. was to</label></div>
+                            <div class="explanation hidden mt-3 p-3 bg-blue-50 text-blue-800 text-sm rounded-lg border border-blue-200"></div>
+                        </div>
+                        <div class="q-item" data-type="mcq" data-answer="A" data-explain="Thì Hiện tại hoàn thành, 'already' dùng giữa trợ động từ và phân từ II để chỉ hành động đã xảy ra xong sớm hơn dự kiến.">
+                            <p class="font-semibold mb-2">6. Smith writes very quickly. He’s .........................finished his essay.</p>
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-2"><label><input type="radio" name="I1_6" value="A"> a. already</label><label><input type="radio" name="I1_6" value="B"> b. been</label><label><input type="radio" name="I1_6" value="C"> c. for</label><label><input type="radio" name="I1_6" value="D"> d. yet</label></div>
+                            <div class="explanation hidden mt-3 p-3 bg-blue-50 text-blue-800 text-sm rounded-lg border border-blue-200"></div>
+                        </div>
+                        <div class="q-item" data-type="mcq" data-answer="D" data-explain="Cụm động từ: make up one's mind = đưa ra quyết định.">
+                            <p class="font-semibold mb-2">7. What are you going to do? - I don’t know. I haven’t made................my mind yet.</p>
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-2"><label><input type="radio" name="I1_7" value="A"> a. on</label><label><input type="radio" name="I1_7" value="B"> b. at</label><label><input type="radio" name="I1_7" value="C"> c. in</label><label><input type="radio" name="I1_7" value="D"> d. up</label></div>
+                            <div class="explanation hidden mt-3 p-3 bg-blue-50 text-blue-800 text-sm rounded-lg border border-blue-200"></div>
+                        </div>
+                        <div class="q-item" data-type="mcq" data-answer="A" data-explain="'have been to' có nghĩa là đã từng tới một nơi nào đó (và nay đã trở về).">
+                            <p class="font-semibold mb-2">8. I’ve ..............................to Paris. I went there in March.</p>
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-2"><label><input type="radio" name="I1_8" value="A"> a. been</label><label><input type="radio" name="I1_8" value="B"> b. gone</label><label><input type="radio" name="I1_8" value="C"> c. just</label><label><input type="radio" name="I1_8" value="D"> d. yet</label></div>
+                            <div class="explanation hidden mt-3 p-3 bg-blue-50 text-blue-800 text-sm rounded-lg border border-blue-200"></div>
+                        </div>
+                        <div class="q-item" data-type="mcq" data-answer="D" data-explain="Cấu trúc: This is the first/second time + S + HTHT.">
+                            <p class="font-semibold mb-2">9. This is the first ..................... I’ve ever lived far from home.</p>
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-2"><label><input type="radio" name="I1_9" value="A"> a. already</label><label><input type="radio" name="I1_9" value="B"> b. since</label><label><input type="radio" name="I1_9" value="C"> c. that</label><label><input type="radio" name="I1_9" value="D"> d. time</label></div>
+                            <div class="explanation hidden mt-3 p-3 bg-blue-50 text-blue-800 text-sm rounded-lg border border-blue-200"></div>
+                        </div>
+                        <div class="q-item" data-type="mcq" data-answer="D" data-explain="'say to somebody' = nói với ai đó.">
+                            <p class="font-semibold mb-2">10. What did the girl say ........................?</p>
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-2"><label><input type="radio" name="I1_10" value="A"> a. at you</label><label><input type="radio" name="I1_10" value="B"> b. for you</label><label><input type="radio" name="I1_10" value="C"> c. you</label><label><input type="radio" name="I1_10" value="D"> d. to you?</label></div>
+                            <div class="explanation hidden mt-3 p-3 bg-blue-50 text-blue-800 text-sm rounded-lg border border-blue-200"></div>
+                        </div>
+                        <div class="q-item" data-type="mcq" data-answer="A" data-explain="Trong câu gián tiếp, động từ phải lùi thì. 'is' lùi về 'was'.">
+                            <p class="font-semibold mb-2">11. Phong rang his friend in Nha Trang yesterday, and he said it ..............raining there.</p>
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-2"><label><input type="radio" name="I1_11" value="A"> a. was</label><label><input type="radio" name="I1_11" value="B"> b. is</label><label><input type="radio" name="I1_11" value="C"> c. should be</label><label><input type="radio" name="I1_11" value="D"> d. to be</label></div>
+                            <div class="explanation hidden mt-3 p-3 bg-blue-50 text-blue-800 text-sm rounded-lg border border-blue-200"></div>
+                        </div>
+                        <div class="q-item" data-type="mcq" data-answer="D" data-explain="Trong câu gián tiếp, 'last week' đổi thành 'the previous week' hoặc 'the week before'.">
+                            <p class="font-semibold mb-2">12. The last time I saw Khang, he looked very relaxed. He explained that he’d been on holiday the ........................week.</p>
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-2"><label><input type="radio" name="I1_12" value="A"> a. earlier</label><label><input type="radio" name="I1_12" value="B"> b. following</label><label><input type="radio" name="I1_12" value="C"> c. next</label><label><input type="radio" name="I1_12" value="D"> d. previous</label></div>
+                            <div class="explanation hidden mt-3 p-3 bg-blue-50 text-blue-800 text-sm rounded-lg border border-blue-200"></div>
+                        </div>
+                        <div class="q-item" data-type="mcq" data-answer="C" data-explain="'wonder whether' = tự hỏi liệu rằng.">
+                            <p class="font-semibold mb-2">13. We wonder ........................the tickets are on sales yet.</p>
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-2"><label><input type="radio" name="I1_13" value="A"> a. what</label><label><input type="radio" name="I1_13" value="B"> b. when</label><label><input type="radio" name="I1_13" value="C"> c. whether</label><label><input type="radio" name="I1_13" value="D"> d. where</label></div>
+                            <div class="explanation hidden mt-3 p-3 bg-blue-50 text-blue-800 text-sm rounded-lg border border-blue-200"></div>
+                        </div>
+                        <div class="q-item" data-type="mcq" data-answer="B" data-explain="Câu gián tiếp, 'today' chuyển thành 'that day'.">
+                            <p class="font-semibold mb-2">14. When I rang Oanh some time last week, she said she was busy.................day.</p>
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-2"><label><input type="radio" name="I1_14" value="A"> a. this</label><label><input type="radio" name="I1_14" value="B"> b. that</label><label><input type="radio" name="I1_14" value="C"> c. then</label><label><input type="radio" name="I1_14" value="D"> d. the</label></div>
+                            <div class="explanation hidden mt-3 p-3 bg-blue-50 text-blue-800 text-sm rounded-lg border border-blue-200"></div>
+                        </div>
+                        <div class="q-item" data-type="mcq" data-answer="C" data-explain="'put' phát âm là /ʊ/, các từ còn lại phát âm là /ʌ/.">
+                            <p class="font-semibold mb-2">15. Which word has the underlined part pronounced differently from the others?</p>
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-2"><label><input type="radio" name="I1_15" value="A"> a. j<span class="underline">u</span>st</label><label><input type="radio" name="I1_15" value="B"> b. s<span class="underline">u</span>n</label><label><input type="radio" name="I1_15" value="C"> c. p<span class="underline">u</span>t</label><label><input type="radio" name="I1_15" value="D"> d. b<span class="underline">u</span>cket</label></div>
+                            <div class="explanation hidden mt-3 p-3 bg-blue-50 text-blue-800 text-sm rounded-lg border border-blue-200"></div>
+                        </div>
+                        <div class="q-item" data-type="mcq" data-answer="C" data-explain="'heap' phát âm là /i:/, các từ còn lại phát âm là /e/.">
+                            <p class="font-semibold mb-2">16. Which word has the underlined part pronounced differently from the others?</p>
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-2"><label><input type="radio" name="I1_16" value="A"> a. inst<span class="underline">ea</span>d</label><label><input type="radio" name="I1_16" value="B"> b. h<span class="underline">ea</span>d</label><label><input type="radio" name="I1_16" value="C"> c. h<span class="underline">ea</span>p</label><label><input type="radio" name="I1_16" value="D"> d. d<span class="underline">ea</span>d</label></div>
+                            <div class="explanation hidden mt-3 p-3 bg-blue-50 text-blue-800 text-sm rounded-lg border border-blue-200"></div>
+                        </div>
+                        <div class="q-item" data-type="mcq" data-answer="C" data-explain="'garbage' nhấn âm 1, các từ còn lại nhấn âm 2.">
+                            <p class="font-semibold mb-2">17. Which word has a different stress in the group?</p>
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-2"><label><input type="radio" name="I1_17" value="A"> a. amount</label><label><input type="radio" name="I1_17" value="B"> b. inventor</label><label><input type="radio" name="I1_17" value="C"> c. garbage</label><label><input type="radio" name="I1_17" value="D"> d. resource</label></div>
+                            <div class="explanation hidden mt-3 p-3 bg-blue-50 text-blue-800 text-sm rounded-lg border border-blue-200"></div>
+                        </div>
+                        <div class="q-item" data-type="mcq" data-answer="B" data-explain="'never' = chưa bao giờ (Bộ phim này chắc hẳn mới lắm, chúng tôi chưa từng xem nó trước đây).">
+                            <p class="font-semibold mb-2">18. This film must be new. We’ve ........................ seen it before.</p>
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-2"><label><input type="radio" name="I1_18" value="A"> a. ever</label><label><input type="radio" name="I1_18" value="B"> b. never</label><label><input type="radio" name="I1_18" value="C"> c. since</label><label><input type="radio" name="I1_18" value="D"> d. yet</label></div>
+                            <div class="explanation hidden mt-3 p-3 bg-blue-50 text-blue-800 text-sm rounded-lg border border-blue-200"></div>
+                        </div>
+                        <div class="q-item" data-type="mcq" data-answer="C" data-explain="hate + V-ing, thể bị động: hate being V3/ed (Ghét bị người khác yêu cầu làm gì).">
+                            <p class="font-semibold mb-2">19. He hates.......................................to do something by others.</p>
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-2"><label><input type="radio" name="I1_19" value="A"> a. to be asked</label><label><input type="radio" name="I1_19" value="B"> b. asking</label><label><input type="radio" name="I1_19" value="C"> c. being asked</label><label><input type="radio" name="I1_19" value="D"> d. to ask</label></div>
+                            <div class="explanation hidden mt-3 p-3 bg-blue-50 text-blue-800 text-sm rounded-lg border border-blue-200"></div>
+                        </div>
+                        <div class="q-item" data-type="mcq" data-answer="D" data-explain="Câu hỏi đuôi của 'Let's ...' luôn là 'shall we?'.">
+                            <p class="font-semibold mb-2">20. Let’s go camping in the mountain, ........................?</p>
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-2"><label><input type="radio" name="I1_20" value="A"> a. do we</label><label><input type="radio" name="I1_20" value="B"> b. can we</label><label><input type="radio" name="I1_20" value="C"> c. will we</label><label><input type="radio" name="I1_20" value="D"> d. shall we</label></div>
+                            <div class="explanation hidden mt-3 p-3 bg-blue-50 text-blue-800 text-sm rounded-lg border border-blue-200"></div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Q2. Word Forms -->
+                <section class="mb-10">
+                    <h3 class="text-lg font-bold text-blue-700 mb-4">Question 2: Supply the correct forms of the word in parentheses.</h3>
+                    <ul class="space-y-4">
+                        <li class="q-item flex flex-col md:flex-row md:items-center justify-between border-b border-dashed border-gray-300 pb-2" data-type="text" data-answer="attractively" data-explain="Trạng từ bổ nghĩa cho động từ 'arranged'.">
+                            <span class="flex-1">1. Phuong Linh arranged flowers the most <input type="text" class="text-input short-input"> in the contest.</span>
+                            <span class="font-bold text-gray-500 w-32 text-right">ATTRACT</span>
+                            <div class="explanation hidden w-full mt-2 p-2 bg-blue-50 text-blue-800 text-sm rounded border border-blue-200 order-last"></div>
+                        </li>
+                        <li class="q-item flex flex-col md:flex-row md:items-center justify-between border-b border-dashed border-gray-300 pb-2" data-type="text" data-answer="participants" data-explain="Cần danh từ chỉ người số nhiều (người tham gia).">
+                            <span class="flex-1">2. It is a contest in which <input type="text" class="text-input short-input"> have to read two poems in English.</span>
+                            <span class="font-bold text-gray-500 w-32 text-right">PARTICIPATE</span>
+                            <div class="explanation hidden w-full mt-2 p-2 bg-blue-50 text-blue-800 text-sm rounded border border-blue-200 order-last"></div>
+                        </li>
+                        <li class="q-item flex flex-col md:flex-row md:items-center justify-between border-b border-dashed border-gray-300 pb-2" data-type="text" data-answer="environmentalists" data-explain="Danh từ chỉ người, số nhiều do động từ 'are'.">
+                            <span class="flex-1">3. <input type="text" class="text-input short-input"> are concerned about the use of dynamite to catch fish.</span>
+                            <span class="font-bold text-gray-500 w-32 text-right">ENVIRONMENT</span>
+                            <div class="explanation hidden w-full mt-2 p-2 bg-blue-50 text-blue-800 text-sm rounded border border-blue-200 order-last"></div>
+                        </li>
+                        <li class="q-item flex flex-col md:flex-row md:items-center justify-between border-b border-dashed border-gray-300 pb-2" data-type="text" data-answer="recognition" data-explain="Sau giới từ 'of' cần danh từ.">
+                            <span class="flex-1">4. Years later, she passed me in the street without even a small sign of <input type="text" class="text-input short-input">.</span>
+                            <span class="font-bold text-gray-500 w-32 text-right">RECOGNIZE</span>
+                            <div class="explanation hidden w-full mt-2 p-2 bg-blue-50 text-blue-800 text-sm rounded border border-blue-200 order-last"></div>
+                        </li>
+                        <li class="q-item flex flex-col md:flex-row md:items-center justify-between border-b border-dashed border-gray-300 pb-2" data-type="text" data-answer="pressure" data-explain="Danh từ của động từ press (áp lực, sức ép).">
+                            <span class="flex-1">5. Nam put <input type="text" class="text-input short-input"> on that towel to stop the bleeding.</span>
+                            <span class="font-bold text-gray-500 w-32 text-right">PRESS</span>
+                            <div class="explanation hidden w-full mt-2 p-2 bg-blue-50 text-blue-800 text-sm rounded border border-blue-200 order-last"></div>
+                        </li>
+                        <li class="q-item flex flex-col md:flex-row md:items-center justify-between border-b border-dashed border-gray-300 pb-2" data-type="text" data-answer="failure" data-explain="Sau giới từ 'of' cần danh từ (sự thất bại).">
+                            <span class="flex-1">6. After many years of <input type="text" class="text-input short-input">, Edison finally succeeded.</span>
+                            <span class="font-bold text-gray-500 w-32 text-right">FAIL</span>
+                            <div class="explanation hidden w-full mt-2 p-2 bg-blue-50 text-blue-800 text-sm rounded border border-blue-200 order-last"></div>
+                        </li>
+                        <li class="q-item flex flex-col md:flex-row md:items-center justify-between border-b border-dashed border-gray-300 pb-2" data-type="text" data-answer="anxiety" data-explain="Danh từ của anxious: anxiety (sự lo lắng).">
+                            <span class="flex-1">7. We use first-aid in order to ease the victim’s pain and <input type="text" class="text-input short-input">.</span>
+                            <span class="font-bold text-gray-500 w-32 text-right">ANXIOUS</span>
+                            <div class="explanation hidden w-full mt-2 p-2 bg-blue-50 text-blue-800 text-sm rounded border border-blue-200 order-last"></div>
+                        </li>
+                        <li class="q-item flex flex-col md:flex-row md:items-center justify-between border-b border-dashed border-gray-300 pb-2" data-type="text" data-answer="relieved" data-explain="Sau linking verb 'felt' cần tính từ chỉ cảm xúc (thấy nhẹ nhõm).">
+                            <span class="flex-1">8. She felt <input type="text" class="text-input short-input"> after she passed the exam.</span>
+                            <span class="font-bold text-gray-500 w-32 text-right">RELIEF</span>
+                            <div class="explanation hidden w-full mt-2 p-2 bg-blue-50 text-blue-800 text-sm rounded border border-blue-200 order-last"></div>
+                        </li>
+                        <li class="q-item flex flex-col md:flex-row md:items-center justify-between border-b border-dashed border-gray-300 pb-2" data-type="text" data-answer="arrival" data-explain="Sau tính từ sở hữu 'your' cần danh từ.">
+                            <span class="flex-1">9. You’ll meet the tour guide on your <input type="text" class="text-input short-input"> at the hotel.</span>
+                            <span class="font-bold text-gray-500 w-32 text-right">ARRIVE</span>
+                            <div class="explanation hidden w-full mt-2 p-2 bg-blue-50 text-blue-800 text-sm rounded border border-blue-200 order-last"></div>
+                        </li>
+                        <li class="q-item flex flex-col md:flex-row md:items-center justify-between border-b border-dashed border-gray-300 pb-2" data-type="text" data-answer="destinations" data-explain="Cần danh từ số nhiều: destinations (những điểm đến).">
+                            <span class="flex-1">10. We can take buses or trains to Northern <input type="text" class="text-input short-input"> of Nha Trang.</span>
+                            <span class="font-bold text-gray-500 w-32 text-right">DESTINE</span>
+                            <div class="explanation hidden w-full mt-2 p-2 bg-blue-50 text-blue-800 text-sm rounded border border-blue-200 order-last"></div>
+                        </li>
+                        <li class="q-item flex flex-col md:flex-row md:items-center justify-between border-b border-dashed border-gray-300 pb-2" data-type="text" data-answer="mountainous" data-explain="Tính từ bổ nghĩa cho danh từ resort.">
+                            <span class="flex-1">11. Sapa is considered the most beautiful <input type="text" class="text-input short-input"> resort.</span>
+                            <span class="font-bold text-gray-500 w-32 text-right">MOUNTAIN</span>
+                            <div class="explanation hidden w-full mt-2 p-2 bg-blue-50 text-blue-800 text-sm rounded border border-blue-200 order-last"></div>
+                        </li>
+                        <li class="q-item flex flex-col md:flex-row md:items-center justify-between border-b border-dashed border-gray-300 pb-2" data-type="text" data-answer="undress" data-explain="dress and undress: mặc và cởi quần áo.">
+                            <span class="flex-1">12. It’s now high time you knew how to dress and <input type="text" class="text-input short-input"> yourself.</span>
+                            <span class="font-bold text-gray-500 w-32 text-right">DRESS</span>
+                            <div class="explanation hidden w-full mt-2 p-2 bg-blue-50 text-blue-800 text-sm rounded border border-blue-200 order-last"></div>
+                        </li>
+                        <li class="q-item flex flex-col md:flex-row md:items-center justify-between border-b border-dashed border-gray-300 pb-2" data-type="text" data-answer="hospitable" data-explain="Cần tính từ chỉ tính cách song song với 'friendly'.">
+                            <span class="flex-1">13. People on the island are very friendly and <input type="text" class="text-input short-input">.</span>
+                            <span class="font-bold text-gray-500 w-32 text-right">HOSPITALITY</span>
+                            <div class="explanation hidden w-full mt-2 p-2 bg-blue-50 text-blue-800 text-sm rounded border border-blue-200 order-last"></div>
+                        </li>
+                        <li class="q-item flex flex-col md:flex-row md:items-center justify-between border-b border-dashed border-gray-300 pb-2" data-type="text" data-answer="disappearance" data-explain="Sau tính từ 'sudden' cần danh từ. Sự mất tích = disappearance.">
+                            <span class="flex-1">14. The police are interested in the sudden <input type="text" class="text-input short-input"> of the painting.</span>
+                            <span class="font-bold text-gray-500 w-32 text-right">APPEAR</span>
+                            <div class="explanation hidden w-full mt-2 p-2 bg-blue-50 text-blue-800 text-sm rounded border border-blue-200 order-last"></div>
+                        </li>
+                        <li class="q-item flex flex-col md:flex-row md:items-center justify-between border-b border-dashed border-gray-300 pb-2" data-type="text" data-answer="endless" data-explain="endless: không ngừng, vô tận (tính từ).">
+                            <span class="flex-1">15. I wrote <input type="text" class="text-input short-input"> letters of application but I got no reply.</span>
+                            <span class="font-bold text-gray-500 w-32 text-right">END</span>
+                            <div class="explanation hidden w-full mt-2 p-2 bg-blue-50 text-blue-800 text-sm rounded border border-blue-200 order-last"></div>
+                        </li>
+                        <li class="q-item flex flex-col md:flex-row md:items-center justify-between border-b border-dashed border-gray-300 pb-2" data-type="text" data-answer="magically" data-explain="Trạng từ bổ nghĩa cho động từ 'changed'.">
+                            <span class="flex-1">16. A fairy appeared and <input type="text" class="text-input short-input"> changed her old clothes.</span>
+                            <span class="font-bold text-gray-500 w-32 text-right">MAGIC</span>
+                            <div class="explanation hidden w-full mt-2 p-2 bg-blue-50 text-blue-800 text-sm rounded border border-blue-200 order-last"></div>
+                        </li>
+                        <li class="q-item flex flex-col md:flex-row md:items-center justify-between border-b border-dashed border-gray-300 pb-2" data-type="text" data-answer="wisdom" data-explain="Danh từ của wise là wisdom (sự khôn ngoan).">
+                            <span class="flex-1">17. The tiger wanted to see the farmer’s <input type="text" class="text-input short-input">.</span>
+                            <span class="font-bold text-gray-500 w-32 text-right">WISE</span>
+                            <div class="explanation hidden w-full mt-2 p-2 bg-blue-50 text-blue-800 text-sm rounded border border-blue-200 order-last"></div>
+                        </li>
+                        <li class="q-item flex flex-col md:flex-row md:items-center justify-between border-b border-dashed border-gray-300 pb-2" data-type="text" data-answer="married" data-explain="get married to sb: kết hôn với ai.">
+                            <span class="flex-1">18. In that story, the prince got <input type="text" class="text-input short-input"> to a poor girl.</span>
+                            <span class="font-bold text-gray-500 w-32 text-right">MARRY</span>
+                            <div class="explanation hidden w-full mt-2 p-2 bg-blue-50 text-blue-800 text-sm rounded border border-blue-200 order-last"></div>
+                        </li>
+                        <li class="q-item flex flex-col md:flex-row md:items-center justify-between border-b border-dashed border-gray-300 pb-2" data-type="text" data-answer="application" data-explain="application form: Đơn đăng ký (danh từ ghép).">
+                            <span class="flex-1">19. Let me get an <input type="text" class="text-input short-input"> form and I can fill out.</span>
+                            <span class="font-bold text-gray-500 w-32 text-right">APPLY</span>
+                            <div class="explanation hidden w-full mt-2 p-2 bg-blue-50 text-blue-800 text-sm rounded border border-blue-200 order-last"></div>
+                        </li>
+                        <li class="q-item flex flex-col md:flex-row md:items-center justify-between border-b border-dashed border-gray-300 pb-2" data-type="text" data-answer="foolish" data-explain="Tính từ chỉ tính cách (ngu ngốc).">
+                            <span class="flex-1">20. He was <input type="text" class="text-input short-input"> to say that English is helpless.</span>
+                            <span class="font-bold text-gray-500 w-32 text-right">FOOL</span>
+                            <div class="explanation hidden w-full mt-2 p-2 bg-blue-50 text-blue-800 text-sm rounded border border-blue-200 order-last"></div>
+                        </li>
+                    </ul>
+                </section>
+
+                <!-- SECTION II -->
+                <h2 class="text-2xl font-extrabold text-blue-800 border-b-4 border-blue-200 pb-2 mb-8 mt-12 uppercase">II. Section Two: Reading Comprehension</h2>
+
+                <!-- Q1. Match headings -->
+                <section class="mb-10">
+                    <h3 class="text-lg font-bold text-blue-700 mb-4">Question 1: Read these passages and match each passage to its title (A-F). There is ONE title you needn’t use.</h3>
+                    <div class="bg-gray-100 p-4 rounded-lg mb-6 grid grid-cols-1 md:grid-cols-2 gap-2 text-gray-800 font-semibold border border-gray-300">
+                        <div>A. How I began</div>
+                        <div>B. The worst aspect of my hobby</div>
+                        <div>C. My hopes for the future</div>
+                        <div>D. My most frightening experience</div>
+                        <div>E. Why I like my hobby</div>
+                        <div>F. When and where I do it</div>
+                    </div>
+                    
+                    <div class="space-y-6 text-gray-700 leading-relaxed text-justify">
+                        <div class="q-item border-l-4 border-blue-500 pl-4 py-2" data-type="text" data-answer="e" data-explain="Đoạn văn miêu tả lý do tác giả thích sở thích của mình ('That's why I love playing them so much').">
+                            <div class="flex items-center mb-2">
+                                <span class="font-bold mr-2 text-lg">1.</span>
+                                <input type="text" class="text-input w-16 text-xl" placeholder="A-F" maxlength="1">
+                            </div>
+                            <p>For me, every weekday begins the same: I get up at 7.00. I have breakfast, I take the bus to school, I go to lessons ... I don’t hate this daily <span class="has-tooltip">routine<span class="tooltip-text">Thói quen</span></span>, but it isn’t very <span class="has-tooltip">thrilling<span class="tooltip-text">Hấp dẫn/Kịch tính</span></span>. In the evenings, however, I drive Formula 1 cars, build enormous cities and defend my planet against <span class="has-tooltip">aliens<span class="tooltip-text">Người ngoài hành tinh</span></span>. In short, I play computer games. It’s like entering a different world. That’s why I love playing them so much.</p>
+                            <div class="explanation hidden w-full mt-2 p-2 bg-blue-50 text-blue-800 text-sm rounded border border-blue-200"></div>
+                        </div>
+
+                        <div class="q-item border-l-4 border-blue-500 pl-4 py-2" data-type="text" data-answer="c" data-explain="Tác giả nói về dự định nghề nghiệp tương lai ('want to study computing', 'start my own software company').">
+                            <div class="flex items-center mb-2">
+                                <span class="font-bold mr-2 text-lg">2.</span>
+                                <input type="text" class="text-input w-16 text-xl" placeholder="A-F" maxlength="1">
+                            </div>
+                            <p>My interest in computer games has taught me a lot about computer graphics. I want to study computing at college, and learn how to design and program games. <span class="has-tooltip">Eventually<span class="tooltip-text">Cuối cùng thì</span></span>, I’d like to start my own software company, creating and testing new games. That way, I could spend all day doing what I love most.</p>
+                            <div class="explanation hidden w-full mt-2 p-2 bg-blue-50 text-blue-800 text-sm rounded border border-blue-200"></div>
+                        </div>
+
+                        <div class="q-item border-l-4 border-blue-500 pl-4 py-2" data-type="text" data-answer="b" data-explain="Đoạn văn nhấn mạnh điều tác giả không thích nhất là chi phí ('The only thing I don't like... is the cost').">
+                            <div class="flex items-center mb-2">
+                                <span class="font-bold mr-2 text-lg">3.</span>
+                                <input type="text" class="text-input w-16 text-xl" placeholder="A-F" maxlength="1">
+                            </div>
+                            <p>Computer games are interesting because they often contain stories and characters. The games are getting better all the time, but they are also getting more expensive. The only thing I don’t like about my hobby is the cost! New games are often about $50.</p>
+                            <div class="explanation hidden w-full mt-2 p-2 bg-blue-50 text-blue-800 text-sm rounded border border-blue-200"></div>
+                        </div>
+
+                        <div class="q-item border-l-4 border-blue-500 pl-4 py-2" data-type="text" data-answer="f" data-explain="Nói về thời gian và địa điểm chơi ('meet at my house in the evenings', 'play at weekends').">
+                            <div class="flex items-center mb-2">
+                                <span class="font-bold mr-2 text-lg">4.</span>
+                                <input type="text" class="text-input w-16 text-xl" placeholder="A-F" maxlength="1">
+                            </div>
+                            <p>Some of my friends from school are interested in computer games too. We normally meet at my house in the evenings and play for a few hours. We sometimes play at weekends, but if the weather’s good I prefer to go cycling or play basketball instead.</p>
+                            <div class="explanation hidden w-full mt-2 p-2 bg-blue-50 text-blue-800 text-sm rounded border border-blue-200"></div>
+                        </div>
+
+                        <div class="q-item border-l-4 border-blue-500 pl-4 py-2" data-type="text" data-answer="a" data-explain="Kể về lần đầu tiên biết đến sở thích này ('I first became interested in... about four years ago').">
+                            <div class="flex items-center mb-2">
+                                <span class="font-bold mr-2 text-lg">5.</span>
+                                <input type="text" class="text-input w-16 text-xl" placeholder="A-F" maxlength="1">
+                            </div>
+                            <p>I first became interested in computer games about four years ago. I was staying with my cousin for the weekend. He had some games and he taught me how to play them. I became hooked immediately! When I got home, I decided to save all my money for buying games. Now I’ve got about twenty different games.</p>
+                            <div class="explanation hidden w-full mt-2 p-2 bg-blue-50 text-blue-800 text-sm rounded border border-blue-200"></div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Q2. Cloze Test -->
+                <section class="mb-10">
+                    <h3 class="text-lg font-bold text-blue-700 mb-4">Question 2: Read the text and choose the best answer to fill in each gap</h3>
+                    <div class="bg-yellow-50 p-6 rounded-lg border border-yellow-200 mb-6 text-gray-800 leading-relaxed text-justify shadow-inner">
+                        &nbsp;&nbsp;&nbsp;&nbsp;Have you ever followed instructions for knitting something or have you read a piece of music? If you have, you have behaved in a similar way <span class="font-bold text-blue-600 bg-white px-2 py-1 border rounded">(1)</span> a computer. A computer obeys a program to carry out a particular task. Just <span class="font-bold text-blue-600 bg-white px-2 py-1 border rounded">(2)</span> a knitting pattern is expressed in numbers and piece of music in lines and dots, so a computer program is <span class="font-bold text-blue-600 bg-white px-2 py-1 border rounded">(3)</span> in the form of <span class="has-tooltip">programming language<span class="tooltip-text">Ngôn ngữ lập trình</span></span>. Like the English language (or any other language), there are <span class="font-bold text-blue-600 bg-white px-2 py-1 border rounded">(4)</span> of grammar, and a program must be correct in every way.<br><br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;There are hundreds of programming language, but only <span class="font-bold text-blue-600 bg-white px-2 py-1 border rounded">(5)</span> are well-known and widely used. The most popular language which is used in offices <span class="font-bold text-blue-600 bg-white px-2 py-1 border rounded">(6)</span> Cobol. This language is used for printing <span class="has-tooltip">payrolls<span class="tooltip-text">Bảng lương</span></span> and keeping records of goods. Engineers and scientists use Fortran <span class="font-bold text-blue-600 bg-white px-2 py-1 border rounded">(7)</span> carry out <span class="has-tooltip">calculations<span class="tooltip-text">Các phép tính</span></span>. <span class="font-bold text-blue-600 bg-white px-2 py-1 border rounded">(8)</span> neither of these two programs is very popular with people working on home computers. Basis is the most popular language for home computers, chiefly <span class="font-bold text-blue-600 bg-white px-2 py-1 border rounded">(9)</span> it is easy to learn and use.<br><br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="font-bold text-blue-600 bg-white px-2 py-1 border rounded">(10)</span> these languages are useful for many purposes, it is time that a new simple program was devised. Such a program ought to be not only easy to use but also completely reliable.
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="q-item p-3 border rounded-lg" data-type="mcq" data-answer="A" data-explain="'similar to': tương tự với.">
+                            <p class="font-semibold">(1)</p>
+                            <div class="flex space-x-4"><label><input type="radio" name="II2_1" value="A"> A. to</label><label><input type="radio" name="II2_1" value="B"> B. as</label><label><input type="radio" name="II2_1" value="C"> C. so</label><label><input type="radio" name="II2_1" value="D"> D. from</label></div>
+                            <div class="explanation hidden mt-2 text-sm"></div>
+                        </div>
+                        <div class="q-item p-3 border rounded-lg" data-type="mcq" data-answer="D" data-explain="'Just as...': Giống như là...">
+                            <p class="font-semibold">(2)</p>
+                            <div class="flex space-x-4"><label><input type="radio" name="II2_2" value="A"> A. like</label><label><input type="radio" name="II2_2" value="B"> B. by</label><label><input type="radio" name="II2_2" value="C"> C. too</label><label><input type="radio" name="II2_2" value="D"> D. as</label></div>
+                            <div class="explanation hidden mt-2 text-sm"></div>
+                        </div>
+                        <div class="q-item p-3 border rounded-lg" data-type="mcq" data-answer="C" data-explain="Bị động: is expressed (được thể hiện).">
+                            <p class="font-semibold">(3)</p>
+                            <div class="flex space-x-4"><label><input type="radio" name="II2_3" value="A"> A. expensive</label><label><input type="radio" name="II2_3" value="B"> B. expresses</label><label><input type="radio" name="II2_3" value="C"> C. expressed</label><label><input type="radio" name="II2_3" value="D"> D. expressing</label></div>
+                            <div class="explanation hidden mt-2 text-sm"></div>
+                        </div>
+                        <div class="q-item p-3 border rounded-lg" data-type="mcq" data-answer="A" data-explain="'rules of grammar': các quy tắc ngữ pháp.">
+                            <p class="font-semibold">(4)</p>
+                            <div class="flex space-x-4"><label><input type="radio" name="II2_4" value="A"> A. rules</label><label><input type="radio" name="II2_4" value="B"> B. laws</label><label><input type="radio" name="II2_4" value="C"> C. regulations</label><label><input type="radio" name="II2_4" value="D"> D. principles</label></div>
+                            <div class="explanation hidden mt-2 text-sm"></div>
+                        </div>
+                        <div class="q-item p-3 border rounded-lg" data-type="mcq" data-answer="B" data-explain="'languages' đếm được -> dùng 'a few' (một vài).">
+                            <p class="font-semibold">(5)</p>
+                            <div class="flex space-x-4"><label><input type="radio" name="II2_5" value="A"> A. a little</label><label><input type="radio" name="II2_5" value="B"> B. a few</label><label><input type="radio" name="II2_5" value="C"> C. much</label><label><input type="radio" name="II2_5" value="D"> D. a lot of</label></div>
+                            <div class="explanation hidden mt-2 text-sm"></div>
+                        </div>
+                        <div class="q-item p-3 border rounded-lg" data-type="mcq" data-answer="C" data-explain="Động từ chính của mệnh đề, thể bị động: is called.">
+                            <p class="font-semibold">(6)</p>
+                            <div class="flex space-x-4"><label><input type="radio" name="II2_6" value="A"> A. called</label><label><input type="radio" name="II2_6" value="B"> B. calling</label><label><input type="radio" name="II2_6" value="C"> C. is called</label><label><input type="radio" name="II2_6" value="D"> D. is calling</label></div>
+                            <div class="explanation hidden mt-2 text-sm"></div>
+                        </div>
+                        <div class="q-item p-3 border rounded-lg" data-type="mcq" data-answer="D" data-explain="'in order to' + V = để làm gì.">
+                            <p class="font-semibold">(7)</p>
+                            <div class="flex space-x-4"><label><input type="radio" name="II2_7" value="A"> A. so as for</label><label><input type="radio" name="II2_7" value="B"> B. in order that</label><label><input type="radio" name="II2_7" value="C"> C. so as that</label><label><input type="radio" name="II2_7" value="D"> D. in order to</label></div>
+                            <div class="explanation hidden mt-2 text-sm"></div>
+                        </div>
+                        <div class="q-item p-3 border rounded-lg" data-type="mcq" data-answer="D" data-explain="'However': Tuy nhiên (chỉ sự đối lập).">
+                            <p class="font-semibold">(8)</p>
+                            <div class="flex space-x-4"><label><input type="radio" name="II2_8" value="A"> A. In addition</label><label><input type="radio" name="II2_8" value="B"> B. Therefore</label><label><input type="radio" name="II2_8" value="C"> C. Consequently</label><label><input type="radio" name="II2_8" value="D"> D. However</label></div>
+                            <div class="explanation hidden mt-2 text-sm"></div>
+                        </div>
+                        <div class="q-item p-3 border rounded-lg" data-type="mcq" data-answer="A" data-explain="'because' + mệnh đề (S+V) chỉ nguyên nhân.">
+                            <p class="font-semibold">(9)</p>
+                            <div class="flex space-x-4"><label><input type="radio" name="II2_9" value="A"> A. because</label><label><input type="radio" name="II2_9" value="B"> B. if</label><label><input type="radio" name="II2_9" value="C"> C. because of</label><label><input type="radio" name="II2_9" value="D"> D. unless</label></div>
+                            <div class="explanation hidden mt-2 text-sm"></div>
+                        </div>
+                        <div class="q-item p-3 border rounded-lg" data-type="mcq" data-answer="C" data-explain="'Although' + mệnh đề (Mặc dù...).">
+                            <p class="font-semibold">(10)</p>
+                            <div class="flex space-x-4"><label><input type="radio" name="II2_10" value="A"> A. Even</label><label><input type="radio" name="II2_10" value="B"> B. Despite</label><label><input type="radio" name="II2_10" value="C"> C. Although</label><label><input type="radio" name="II2_10" value="D"> D. In spite</label></div>
+                            <div class="explanation hidden mt-2 text-sm"></div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Q3. Error Correction -->
+                <section class="mb-10">
+                    <h3 class="text-lg font-bold text-blue-700 mb-4">Question 3: Find and correct one mistake in each line</h3>
+                    <div class="bg-gray-50 p-6 rounded-lg font-mono text-sm leading-8 border border-gray-300 shadow-inner mb-6 overflow-x-auto">
+                        1. Nam is a student. This year he had a very <span class="font-bold text-red-500">interested</span> summer holiday. He traveled with<br>
+                        2. <span class="font-bold text-red-500">him</span> classmates to a mountainous area in Hoa Binh province. They <span class="font-bold text-red-500">gone</span> there to help<br>
+                        3. make a road through a forest <span class="font-bold text-red-500">among</span> two villages. “It was very difficult because<br>
+                        4. there <span class="font-bold text-red-500">had</span> no water to drink and no shops where we could <span class="font-bold text-red-500">bought</span> food,” said Nam.<br>
+                        5. “It was also cold and wet in the mountains. It is one of the <span class="font-bold text-red-500">wetter</span> place in the country.”<br>
+                        6. Nam stayed in the mountains <span class="font-bold text-red-500">since</span> six weeks. It was hard work, but he says it was<br>
+                        7. the best thing he has ever <span class="font-bold text-red-500">did</span>. He is hoping to return next year to do <span class="font-bold text-red-500">any</span> more work there.
+                    </div>
+                    
+                    <p class="text-sm text-gray-500 mb-4 italic">Điền từ sai vào ô Error, từ đúng vào ô Correction.</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Line 1 -->
+                        <div class="q-item flex items-center space-x-2" data-type="double-text" data-answer1="interested" data-answer2="interesting" data-explain="Bổ nghĩa cho vật (kỳ nghỉ) dùng đuôi -ing.">
+                            <span class="font-bold">1.</span>
+                            <input type="text" class="text-input w-24" placeholder="Error"> <span>&rarr;</span> <input type="text" class="text-input w-24" placeholder="Correction">
+                            <div class="explanation hidden w-full text-xs"></div>
+                        </div>
+                        <div class="q-item flex items-center space-x-2" data-type="double-text" data-answer1="him" data-answer2="his" data-explain="Cần tính từ sở hữu 'his' (bạn cùng lớp của cậu ấy).">
+                            <span class="font-bold">2.</span>
+                            <input type="text" class="text-input w-24" placeholder="Error"> <span>&rarr;</span> <input type="text" class="text-input w-24" placeholder="Correction">
+                            <div class="explanation hidden w-full text-xs"></div>
+                        </div>
+                        <div class="q-item flex items-center space-x-2" data-type="double-text" data-answer1="gone" data-answer2="went" data-explain="Quá khứ đơn của go là went (gone là PII).">
+                            <span class="font-bold">3.</span>
+                            <input type="text" class="text-input w-24" placeholder="Error"> <span>&rarr;</span> <input type="text" class="text-input w-24" placeholder="Correction">
+                            <div class="explanation hidden w-full text-xs"></div>
+                        </div>
+                        <div class="q-item flex items-center space-x-2" data-type="double-text" data-answer1="among" data-answer2="between" data-explain="Giữa 2 ngôi làng dùng 'between'. 'Among' là giữa nhiều hơn 2.">
+                            <span class="font-bold">4.</span>
+                            <input type="text" class="text-input w-24" placeholder="Error"> <span>&rarr;</span> <input type="text" class="text-input w-24" placeholder="Correction">
+                            <div class="explanation hidden w-full text-xs"></div>
+                        </div>
+                        <div class="q-item flex items-center space-x-2" data-type="double-text" data-answer1="had" data-answer2="was" data-explain="There was + danh từ đếm được số ít/không đếm được (water).">
+                            <span class="font-bold">5.</span>
+                            <input type="text" class="text-input w-24" placeholder="Error"> <span>&rarr;</span> <input type="text" class="text-input w-24" placeholder="Correction">
+                            <div class="explanation hidden w-full text-xs"></div>
+                        </div>
+                        <div class="q-item flex items-center space-x-2" data-type="double-text" data-answer1="bought" data-answer2="buy" data-explain="Sau động từ khuyết thiếu 'could' + V nguyên mẫu.">
+                            <span class="font-bold">6.</span>
+                            <input type="text" class="text-input w-24" placeholder="Error"> <span>&rarr;</span> <input type="text" class="text-input w-24" placeholder="Correction">
+                            <div class="explanation hidden w-full text-xs"></div>
+                        </div>
+                        <div class="q-item flex items-center space-x-2" data-type="double-text" data-answer1="wetter" data-answer2="wettest" data-explain="So sánh nhất: the + adj_est.">
+                            <span class="font-bold">7.</span>
+                            <input type="text" class="text-input w-24" placeholder="Error"> <span>&rarr;</span> <input type="text" class="text-input w-24" placeholder="Correction">
+                            <div class="explanation hidden w-full text-xs"></div>
+                        </div>
+                        <div class="q-item flex items-center space-x-2" data-type="double-text" data-answer1="since" data-answer2="for" data-explain="'six weeks' là khoảng thời gian -> dùng for.">
+                            <span class="font-bold">8.</span>
+                            <input type="text" class="text-input w-24" placeholder="Error"> <span>&rarr;</span> <input type="text" class="text-input w-24" placeholder="Correction">
+                            <div class="explanation hidden w-full text-xs"></div>
+                        </div>
+                        <div class="q-item flex items-center space-x-2" data-type="double-text" data-answer1="did" data-answer2="done" data-explain="Hiện tại hoàn thành: has ever + PII (done).">
+                            <span class="font-bold">9.</span>
+                            <input type="text" class="text-input w-24" placeholder="Error"> <span>&rarr;</span> <input type="text" class="text-input w-24" placeholder="Correction">
+                            <div class="explanation hidden w-full text-xs"></div>
+                        </div>
+                        <div class="q-item flex items-center space-x-2" data-type="double-text" data-answer1="any" data-answer2="some" data-explain="'some' dùng trong câu khẳng định, 'any' dùng trong phủ định/nghi vấn.">
+                            <span class="font-bold">10.</span>
+                            <input type="text" class="text-input w-24" placeholder="Error"> <span>&rarr;</span> <input type="text" class="text-input w-24" placeholder="Correction">
+                            <div class="explanation hidden w-full text-xs"></div>
+                        </div>
+                    </div>
+                </section>
+
+
+                <!-- SECTION III -->
+                <h2 class="text-2xl font-extrabold text-blue-800 border-b-4 border-blue-200 pb-2 mb-8 mt-12 uppercase">III. Section Three: Writing</h2>
+
+                <!-- Q1. Rearrange -->
+                <section class="mb-10">
+                    <h3 class="text-lg font-bold text-blue-700 mb-4">Question 1: Rearrange the words to make meaningful sentences</h3>
+                    <div class="space-y-4 text-sm">
+                        <div class="q-item flex flex-col" data-type="text" data-answer="how many tons of rice were exported to japan last year" data-explain="Câu hỏi dạng bị động thì QKĐ.">
+                            <label class="font-semibold text-gray-700">1. exported / many / last year / rice / how / to/ Japan / tons / were / of / ?</label>
+                            <input type="text" class="text-input long-input mt-1 p-2" placeholder="Your answer...">
+                            <div class="explanation hidden mt-1"></div>
+                        </div>
+                        <div class="q-item flex flex-col" data-type="text" data-answer="the boys in the volunteer group are planting trees on the hill" data-explain="Thì hiện tại tiếp diễn chỉ hành động đang diễn ra.">
+                            <label class="font-semibold text-gray-700">2. trees / planting / on / the boys / the hill / group / are / the / in / volunteer / .</label>
+                            <input type="text" class="text-input long-input mt-1 p-2" placeholder="Your answer...">
+                            <div class="explanation hidden mt-1"></div>
+                        </div>
+                        <div class="q-item flex flex-col" data-type="text" data-answer="the heavy rain prevented us from playing soccer" data-explain="prevent sb from V-ing: ngăn cản ai làm gì.">
+                            <label class="font-semibold text-gray-700">3. rain / heavy / from / prevented / the / playing / us / soccer.</label>
+                            <input type="text" class="text-input long-input mt-1 p-2" placeholder="Your answer...">
+                            <div class="explanation hidden mt-1"></div>
+                        </div>
+                        <div class="q-item flex flex-col" data-type="text" data-answer="if i asked him some money he could lend me then" data-explain="Câu điều kiện loại 2 (trái với thực tế ở hiện tại).">
+                            <label class="font-semibold text-gray-700">4. if / he / me / some / asked / I / money / could / then / lend / him /</label>
+                            <input type="text" class="text-input long-input mt-1 p-2" placeholder="Your answer...">
+                            <div class="explanation hidden mt-1"></div>
+                        </div>
+                        <div class="q-item flex flex-col" data-type="text" data-answer="an englishman had someone design a card to send christmas greetings to his friends" data-explain="have sb do sth: nhờ ai làm gì (thể sai khiến).">
+                            <label class="font-semibold text-gray-700">5. design / to send / friends / someone / greetings / Englishman / a card / Christmas / to / an / his / had /.</label>
+                            <input type="text" class="text-input long-input mt-1 p-2" placeholder="Your answer...">
+                            <div class="explanation hidden mt-1"></div>
+                        </div>
+                        <div class="q-item flex flex-col" data-type="text" data-answer="they are living with their children at 186 le lai street in an giang" data-explain="Địa chỉ có số nhà cụ thể dùng 'at', tên tỉnh/thành phố dùng 'in'.">
+                            <label class="font-semibold text-gray-700">6. Le Lai Street / are/ living / they / in / at / An Giang / their / with /children / 186.</label>
+                            <input type="text" class="text-input long-input mt-1 p-2" placeholder="Your answer...">
+                            <div class="explanation hidden mt-1"></div>
+                        </div>
+                        <div class="q-item flex flex-col" data-type="text" data-answer="their uncle spent most of his time practicing the violin in the music room" data-explain="spend time V-ing: dành thời gian làm gì.">
+                            <label class="font-semibold text-gray-700">7. uncle / spent / most / their /of /the /violin / practicing / his time / in / room /music /the/.</label>
+                            <input type="text" class="text-input long-input mt-1 p-2" placeholder="Your answer...">
+                            <div class="explanation hidden mt-1"></div>
+                        </div>
+                        <div class="q-item flex flex-col" data-type="text" data-answer="which sentence tells us that she is more beautiful than her sister" data-explain="Câu hỏi với từ để hỏi Which làm chủ ngữ.">
+                            <label class="font-semibold text-gray-700">8. which / us / tells / sentence / that / more / than / is / she / her / beautiful / sister /?</label>
+                            <input type="text" class="text-input long-input mt-1 p-2" placeholder="Your answer...">
+                            <div class="explanation hidden mt-1"></div>
+                        </div>
+                        <div class="q-item flex flex-col" data-type="text" data-answer="unlike his old friends he is very impolite" data-explain="unlike + N: không giống với...">
+                            <label class="font-semibold text-gray-700">9. his / friends / old / unlike / he / is / impolite / very /.</label>
+                            <input type="text" class="text-input long-input mt-1 p-2" placeholder="Your answer...">
+                            <div class="explanation hidden mt-1"></div>
+                        </div>
+                        <div class="q-item flex flex-col" data-type="text" data-answer="kenny is going to visit his fatherland with his family next month" data-explain="Thì tương lai gần: be going to + V.">
+                            <label class="font-semibold text-gray-700">10. going / fatherland / month / Kenny / his / is / family / next / visit / with / his / to /.</label>
+                            <input type="text" class="text-input long-input mt-1 p-2" placeholder="Your answer...">
+                            <div class="explanation hidden mt-1"></div>
+                        </div>
+                        <div class="q-item flex flex-col" data-type="text" data-answer="he and his colleagues don't have to go to work at the weekend" data-explain="don't have to V: không phải làm gì.">
+                            <label class="font-semibold text-gray-700">11. colleagues / go / he / to / to / weekend / and / don’t / have / at / work / the / his /.</label>
+                            <input type="text" class="text-input long-input mt-1 p-2" placeholder="Your answer...">
+                            <div class="explanation hidden mt-1"></div>
+                        </div>
+                        <div class="q-item flex flex-col" data-type="text" data-answer="she wanted to know if there was a museum near here" data-explain="Câu tường thuật câu hỏi Yes/No với if/whether.">
+                            <label class="font-semibold text-gray-700">12. there / she / near / wanted / a / here / was / museum / know / to / if /.</label>
+                            <input type="text" class="text-input long-input mt-1 p-2" placeholder="Your answer...">
+                            <div class="explanation hidden mt-1"></div>
+                        </div>
+                        <div class="q-item flex flex-col" data-type="text" data-answer="they are going to hold a party at their house tomorrow" data-explain="Thì tương lai gần.">
+                            <label class="font-semibold text-gray-700">13. hold / going / their / are / they / tomorrow / party / house / at / to / a /.</label>
+                            <input type="text" class="text-input long-input mt-1 p-2" placeholder="Your answer...">
+                            <div class="explanation hidden mt-1"></div>
+                        </div>
+                        <div class="q-item flex flex-col" data-type="text" data-answer="the boys are going to the school canteen aren't they|the boys aren't going to the school canteen are they" data-explain="Câu hỏi đuôi.">
+                            <label class="font-semibold text-gray-700">14. going / aren’t / are / boys / the / the / they / canteen / to / school /?</label>
+                            <input type="text" class="text-input long-input mt-1 p-2" placeholder="Your answer...">
+                            <div class="explanation hidden mt-1"></div>
+                        </div>
+                        <div class="q-item flex flex-col" data-type="text" data-answer="if you don't go to bed soon you'll be late for the meeting" data-explain="Câu điều kiện loại 1.">
+                            <label class="font-semibold text-gray-700">15. for / you’ll / meeting / late / be / the / if / bed / to / soon / don’t / you / go</label>
+                            <input type="text" class="text-input long-input mt-1 p-2" placeholder="Your answer...">
+                            <div class="explanation hidden mt-1"></div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Q2. Rewrite -->
+                <section class="mb-10">
+                    <h3 class="text-lg font-bold text-blue-700 mb-4">Question 2: Rewrite sentences as directed</h3>
+                    <div class="space-y-4 text-sm">
+                        <div class="q-item flex flex-col" data-type="text" data-answer="he thought of making toys from used paper" data-explain="It is interesting that + Mệnh đề.">
+                            <label class="font-semibold">1. Thinking of making toys from used paper was his interesting idea.</label>
+                            <div class="flex"><span class="mr-2 italic">It’s interesting that</span> <input type="text" class="text-input long-input flex-1"></div>
+                            <div class="explanation hidden mt-1"></div>
+                        </div>
+                        <div class="q-item flex flex-col" data-type="text" data-answer="over twenty years since he last came back to his home village" data-explain="It is + thời gian + since + S + last + V2/ed.">
+                            <label class="font-semibold">2. He hasn’t come back to his home village for over 20 years now.</label>
+                            <div class="flex"><span class="mr-2 italic">It’s</span> <input type="text" class="text-input long-input flex-1"></div>
+                            <div class="explanation hidden mt-1"></div>
+                        </div>
+                        <div class="q-item flex flex-col" data-type="text" data-answer="seen such a strange film before" data-explain="Cấu trúc I have never seen such a/an + adj + N + before.">
+                            <label class="font-semibold">3. That’s the strangest film I’ve ever seen.</label>
+                            <div class="flex"><span class="mr-2 italic">I have never</span> <input type="text" class="text-input long-input flex-1"></div>
+                            <div class="explanation hidden mt-1"></div>
+                        </div>
+                        <div class="q-item flex flex-col" data-type="text" data-answer="you didn't interrupt me while i am speaking" data-explain="S1 + would rather + S2 + V(QKĐ) (mong muốn ai đó (không) làm gì ở hiện tại).">
+                            <label class="font-semibold">4. Please don’t interrupt me while I am speaking.</label>
+                            <div class="flex"><span class="mr-2 italic">I’d rather</span> <input type="text" class="text-input long-input flex-1"></div>
+                            <div class="explanation hidden mt-1"></div>
+                        </div>
+                        <div class="q-item flex flex-col" data-type="text" data-answer="you don't get up now you'll be late for school" data-explain="Câu điều kiện loại 1 (nếu không làm X thì sẽ bị Y).">
+                            <label class="font-semibold">5. Get up now or you’ll be late for school.</label>
+                            <div class="flex"><span class="mr-2 italic">If</span> <input type="text" class="text-input long-input flex-1"></div>
+                            <div class="explanation hidden mt-1"></div>
+                        </div>
+                        <div class="q-item flex flex-col" data-type="text" data-answer="met each other for ten years" data-explain="The last time... + QKĐ -> We haven't + V3/ed + for...">
+                            <label class="font-semibold">6. The last time we met each other was ten years ago.</label>
+                            <div class="flex"><span class="mr-2 italic">We haven’t</span> <input type="text" class="text-input long-input flex-1"></div>
+                            <div class="explanation hidden mt-1"></div>
+                        </div>
+                        <div class="q-item flex flex-col" data-type="text" data-answer="difficult to find accommodation in da lat at busy time" data-explain="It's + adj + to V.">
+                            <label class="font-semibold">7. Finding accommodation at busy time in Da Lat is difficult.</label>
+                            <div class="flex"><span class="mr-2 italic">It’s</span> <input type="text" class="text-input long-input flex-1"></div>
+                            <div class="explanation hidden mt-1"></div>
+                        </div>
+                        <div class="q-item flex flex-col" data-type="text" data-answer="to be an indoor game" data-explain="used to + V (thói quen, trạng thái trong quá khứ).">
+                            <label class="font-semibold">8. Originally, tennis was an indoor game.</label>
+                            <div class="flex"><span class="mr-2 italic">Tennis used</span> <input type="text" class="text-input long-input flex-1"></div>
+                            <div class="explanation hidden mt-1"></div>
+                        </div>
+                        <div class="q-item flex flex-col" data-type="text" data-answer="living in the countryside better than living in the city" data-explain="prefer V-ing to V-ing = like V-ing better than V-ing.">
+                            <label class="font-semibold">9. My father prefers living in the countryside to living in the city.</label>
+                            <div class="flex"><span class="mr-2 italic">My father likes</span> <input type="text" class="text-input long-input flex-1"></div>
+                            <div class="explanation hidden mt-1"></div>
+                        </div>
+                        <div class="q-item flex flex-col" data-type="text" data-answer="the most intelligent student in my class|the most intelligent in my class" data-explain="Chuyển so sánh bằng sang so sánh nhất.">
+                            <label class="font-semibold">10. Nobody in my class is as intelligent as Lan.</label>
+                            <div class="flex"><span class="mr-2 italic">Lan is</span> <input type="text" class="text-input long-input flex-1"></div>
+                            <div class="explanation hidden mt-1"></div>
+                        </div>
+                        <div class="q-item flex flex-col" data-type="text" data-answer="the first time you have played a computer game" data-explain="Chuyển sang cấu trúc Is this the first time + HTHT.">
+                            <label class="font-semibold">11. Have you ever played a computer game before?</label>
+                            <div class="flex"><span class="mr-2 italic">Is this</span> <input type="text" class="text-input long-input flex-1"></div>
+                            <div class="explanation hidden mt-1"></div>
+                        </div>
+                        <div class="q-item flex flex-col" data-type="text" data-answer="of liberty was presented to the united states by france in 1876|of liberty was presented to the united states by the france in 1876" data-explain="Chuyển sang câu bị động.">
+                            <label class="font-semibold">12. France presented the Statue of Liberty to the United States in 1876.</label>
+                            <div class="flex"><span class="mr-2 italic">The Statue</span> <input type="text" class="text-input long-input flex-1"></div>
+                            <div class="explanation hidden mt-1"></div>
+                        </div>
+                        <div class="q-item flex flex-col" data-type="text" data-answer="warm enough for the children to swim in" data-explain="so... that chuyển sang (not) adj + enough for sb to V.">
+                            <label class="font-semibold">13. The water was so cold that the children couldn’t swim in it.</label>
+                            <div class="flex"><span class="mr-2 italic">The water wasn’t</span> <input type="text" class="text-input long-input flex-1"></div>
+                            <div class="explanation hidden mt-1"></div>
+                        </div>
+                        <div class="q-item flex flex-col" data-type="text" data-answer="since he last chatted with his classmates through the internet" data-explain="It's ages since + S + last + V2/ed.">
+                            <label class="font-semibold">14. He hasn’t chatted with his classmates through the Internet for ages.</label>
+                            <div class="flex"><span class="mr-2 italic">It’s ages</span> <input type="text" class="text-input long-input flex-1"></div>
+                            <div class="explanation hidden mt-1"></div>
+                        </div>
+                        <div class="q-item flex flex-col" data-type="text" data-answer="on animals should be stopped" data-explain="Bị động với modal verb: Modal + be + V3/ed.">
+                            <label class="font-semibold">15. People should stop experiments on animals.</label>
+                            <div class="flex"><span class="mr-2 italic">Experiments</span> <input type="text" class="text-input long-input flex-1"></div>
+                            <div class="explanation hidden mt-1"></div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Submit Button -->
+                <div class="text-center mt-12 border-t pt-8">
+                    <button onclick="submitTest()" id="submitBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-10 rounded-full shadow-lg text-lg transition duration-300 ease-in-out transform hover:-translate-y-1">
+                        Nộp Bài & Xem Điểm
+                    </button>
+                    <p id="feedback-msg" class="text-gray-500 mt-4 hidden">Cuộn lên để xem lại đáp án và giải thích chi tiết cho từng câu nhé!</p>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Script Logic -->
+    <script>
+        // --- Tab Switching Logic ---
+        function switchTab(tabName) {
+            const flashcardSec = document.getElementById('flashcards-section');
+            const testSec = document.getElementById('test-section');
+            const tabFlash = document.getElementById('tab-flashcards');
+            const tabTest = document.getElementById('tab-test');
+
+            if (tabName === 'flashcards') {
+                flashcardSec.classList.remove('hidden');
+                testSec.classList.add('hidden');
+                tabFlash.classList.add('text-blue-600', 'border-blue-600');
+                tabFlash.classList.remove('text-gray-500', 'border-transparent');
+                tabTest.classList.remove('text-blue-600', 'border-blue-600');
+                tabTest.classList.add('text-gray-500', 'border-transparent');
+            } else {
+                testSec.classList.remove('hidden');
+                flashcardSec.classList.add('hidden');
+                tabTest.classList.add('text-blue-600', 'border-blue-600');
+                tabTest.classList.remove('text-gray-500', 'border-transparent');
+                tabFlash.classList.remove('text-blue-600', 'border-blue-600');
+                tabFlash.classList.add('text-gray-500', 'border-transparent');
+            }
+        }
+
+        // --- Flashcard Generator ---
+        const vocabulary = [
+            { en: "Participate", vi: "Tham gia" },
+            { en: "Environmentalist", vi: "Nhà môi trường học" },
+            { en: "Hospitable", vi: "Hiếu khách" },
+            { en: "Destination", vi: "Điểm đến" },
+            { en: "Thrilling", vi: "Hấp dẫn/Kịch tính" },
+            { en: "Routine", vi: "Thói quen hàng ngày" },
+            { en: "Calculation", vi: "Sự tính toán" },
+            { en: "Application", vi: "Đơn xin (việc, học...)" }
+        ];
+
+        const flashcardGrid = document.getElementById('flashcard-grid');
+        vocabulary.forEach(word => {
+            const cardHtml = `
+                <div class="flashcard-container h-32 w-full" onclick="this.querySelector('.flashcard').classList.toggle('flipped')">
+                    <div class="flashcard w-full h-full relative font-bold text-lg">
+                        <div class="flashcard-front">
+                            <span>${word.en}</span>
+                            <span class="text-xs text-gray-400 mt-2 font-normal">(Click to flip)</span>
+                        </div>
+                        <div class="flashcard-back">
+                            <span>${word.vi}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+            flashcardGrid.innerHTML += cardHtml;
+        });
+
+        // --- Helper Function: Clean User Text Input ---
+        // Removes punctuation and normalizes spaces for better matching
+        const cleanText = (txt) => {
+            return txt.toLowerCase().replace(/[.,?!]/g, '').trim().replace(/\s+/g, ' ');
+        };
+
+        // --- Test Grading Logic ---
+        function submitTest() {
+            const questions = document.querySelectorAll('.q-item');
+            let correctCount = 0;
+            let totalCount = questions.length;
+
+            questions.forEach(q => {
+                const type = q.getAttribute('data-type');
+                const explainText = q.getAttribute('data-explain') || '';
+                const expDiv = q.querySelector('.explanation');
+                let isCorrect = false;
+                let correctDisplayAns = "";
+
+                if (type === 'mcq') {
+                    const expected = q.getAttribute('data-answer').toUpperCase();
+                    correctDisplayAns = expected;
+                    const radios = q.querySelectorAll('input[type="radio"]');
+                    let checkedVal = null;
+                    radios.forEach(r => { 
+                        r.disabled = true; // Lock input
+                        if(r.checked) checkedVal = r.value.toUpperCase(); 
+                    });
+
+                    if (checkedVal === expected) {
+                        isCorrect = true;
+                    }
+
+                } else if (type === 'text') {
+                    const expectedStr = q.getAttribute('data-answer');
+                    // Prepare answers by cleaning punctuation and spacing
+                    const expectedAnswers = expectedStr.split('|').map(s => cleanText(s));
+                    correctDisplayAns = expectedStr.split('|')[0]; // Show the first option as main answer
+
+                    const input = q.querySelector('input[type="text"]');
+                    input.readOnly = true; // Lock input
+                    const userVal = cleanText(input.value); 
+
+                    if (expectedAnswers.includes(userVal)) {
+                        isCorrect = true;
+                        input.classList.add('text-green-600', 'border-green-600');
+                    } else {
+                        input.classList.add('text-red-500', 'border-red-500');
+                    }
+
+                } else if (type === 'double-text') {
+                    const ans1 = cleanText(q.getAttribute('data-answer1'));
+                    const ans2 = cleanText(q.getAttribute('data-answer2'));
+                    correctDisplayAns = `Error: ${ans1} -> Correction: ${ans2}`;
+
+                    const inputs = q.querySelectorAll('input[type="text"]');
+                    inputs[0].readOnly = true; inputs[1].readOnly = true;
+                    const u1 = cleanText(inputs[0].value);
+                    const u2 = cleanText(inputs[1].value);
+
+                    if (u1 === ans1 && u2 === ans2) {
+                        isCorrect = true;
+                        inputs[0].classList.add('text-green-600', 'border-green-600');
+                        inputs[1].classList.add('text-green-600', 'border-green-600');
+                    } else {
+                        inputs[0].classList.add('text-red-500', 'border-red-500');
+                        inputs[1].classList.add('text-red-500', 'border-red-500');
+                    }
+                }
+
+                // Update UI based on correct/incorrect
+                if (isCorrect) {
+                    correctCount++;
+                    q.classList.add('bg-green-50', 'border-l-4', 'border-green-500', 'pl-4', '-ml-4', 'rounded-r-lg');
+                } else {
+                    q.classList.add('bg-red-50', 'border-l-4', 'border-red-500', 'pl-4', '-ml-4', 'rounded-r-lg');
+                }
+
+                // Show Explanation
+                expDiv.innerHTML = `
+                    <span class="${isCorrect ? 'text-green-700' : 'text-red-600'} font-bold">
+                        ${isCorrect ? '✓ CHÍNH XÁC' : '✗ SAI'} 
+                    </span> | 
+                    <strong>Đáp án: <span class="text-blue-800">${correctDisplayAns}</span></strong>
+                    ${explainText ? `<br><span class="text-gray-700 mt-1 block"><em>Giải thích:</em> ${explainText}</span>` : ''}
+                `;
+                expDiv.classList.remove('hidden');
+            });
+
+            // Calculate Score (Scale to 10)
+            const score10 = ((correctCount / totalCount) * 10).toFixed(2);
+            
+            // Display Score in Header
+            const scoreDisplay = document.getElementById('score-display');
+            document.getElementById('score-val').innerText = score10;
+            scoreDisplay.classList.remove('hidden');
+
+            // Button Feedback
+            const btn = document.getElementById('submitBtn');
+            btn.innerText = `ĐIỂM CỦA BẠN: ${score10} / 10`;
+            btn.classList.replace('bg-blue-600', 'bg-gray-800');
+            btn.classList.replace('hover:bg-blue-700', 'hover:bg-gray-900');
+            btn.disabled = true;
+
+            document.getElementById('feedback-msg').classList.remove('hidden');
+            
+            // Scroll to top to see results
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>
